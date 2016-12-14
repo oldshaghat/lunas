@@ -8,6 +8,13 @@
     "start": "node --use_strict start.js"
   },
   "author": "Mike Bush <oldshaghat@gmail.com>",
-  "license": "UNLICENSED"
-
+  "license": "UNLICENSED",
+  "dependencies": {
+    "express": "latest",
+    "express-session": "latest",
+    "express-validator": "latest",
+    "nodemailer": "latest",
+    "passport": "latest",
+    "passport-local": "latest"
+  }
 }
