@@ -16,8 +16,5 @@
     "nodemailer": "latest",
     "passport": "latest",
     "passport-local": "latest",
-  },
-  "devDependencies": {
-
   }
 }
