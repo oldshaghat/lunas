@@ -3,8 +3,20 @@ const http         = require('http'),
       path         = require('path'),
       contentTypes = require('./utils/content-types'),
       sysInfo      = require('./utils/sys-info'),
-      env          = process.env;
+      env          = process.env,
+      express      = require('express');
 
+var app = express();
+
+app.get('/', function(req, res) {
+   res.send('index.html');
+});
+
+app.get('/health', function(req, res) {
+    res.sendStatus(200);
+});
+
+/*
 let server = http.createServer(function (req, res) {
   let url = req.url;
   if (url == '/') {
@@ -41,3 +53,4 @@ let server = http.createServer(function (req, res) {
 server.listen(env.NODE_PORT || 3000, env.NODE_IP || 'localhost', function () {
   console.log(`Application worker ${process.pid} started...`);
 });
+*/
