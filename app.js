@@ -9,7 +9,9 @@ const http         = require('http'),
 var app = express();
 
 app.get('/', function(req, res) {
-   res.sendFile(path.join(__dirname +'/index.html'));
+//   res.sendFile(path.join(__dirname +'/index.html'));
+    res.send("HELLO WORLD");
+    res.end();
 });
 
 app.get('/health', function(req, res) {
