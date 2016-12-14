@@ -1,6 +1,6 @@
 {
   "name": "lunas-volunteers",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "MEAN ish volunteer management",
   "private": true,
   "main": "start.js",
@@ -8,13 +8,5 @@
     "start": "node --use_strict start.js"
   },
   "author": "Mike Bush <oldshaghat@gmail.com>",
-  "license": "UNLICENSED",
-  "dependencies": {
-    "express": "latest",
-    "express-session": "latest",
-    "express-validator": "latest",
-    "nodemailer": "latest",
-    "passport": "latest",
-    "passport-local": "latest"
-  }
+  "license": "UNLICENSED"
 }
