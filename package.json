@@ -5,7 +5,8 @@
   "private": true,
   "main": "start.js",
   "scripts": {
-    "start": "node --use_strict start.js"
+    "start": "node --use_strict start.js",
+    "postinstall" : "bower install"
   },
   "author": "Mike Bush <oldshaghat@gmail.com>",
   "license": "UNLICENSED",
@@ -15,6 +16,7 @@
     "express-validator": "latest",
     "nodemailer": "latest",
     "passport": "latest",
-    "passport-local": "latest"
+    "passport-local": "latest",
+    "bower":"latest"
   }
 }
