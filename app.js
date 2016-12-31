@@ -1,4 +1,5 @@
 const http         = require('http'),
+      process      = require('process'),
       fs           = require('fs'),
       path         = require('path'),
       contentTypes = require('./utils/content-types'),
@@ -20,12 +21,22 @@ const http         = require('http'),
     
 
 var dbUrl = 'mongodb://localhost:27017/volunteers';
+//look for process variables (ie, we're deployed on open shift) to rewrite the url 
+if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
+    dbUrl = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
+    process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
+    process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
+    process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
+    process.env.OPENSHIFT_APP_NAME;
+}
+
 var User;
 var Volunteer;
 
 //TODO : create a new gmail account for volunteering . sources suggest that we can dispatch 99 emails a day this way.
 // we may have to do some configurating on the account to make this happen. 
-var emailTransport = emailer.createTransport('smtps:tbd%40gmail.com:pass@smtp.gmail.com');
+//var emailTransport = emailer.createTransport('smtps:tbd%40gmail.com:pass@smtp.gmail.com');
+var emailTransport = {}; //emailer.createTransport('smtps:tbd%40gmail.com:pass@smtp.gmail.com');
 
 mongoose.connect(dbUrl);
 var db = mongoose.connection;
