@@ -60,7 +60,7 @@ db.once('open', function() {
 var app = express();
 
 app.use(express.static('static'));
-app.use(express.static('bower_components'));
+app.use('/bower', express.static(path.join(__dirname, 'bower_components')));
 app.use(express.static('views'));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded( { extended : true }));
