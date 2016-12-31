@@ -1,0 +1,390 @@
+<!doctype html>
+<html ng-app="volunteerManagement">
+
+<head>
+    <link href="../angular-material/angular-material.css" rel="stylesheet">
+    <link href="../volunteers/main.css" rel="stylesheet">
+    
+    <script src="../angular/angular.js"></script>
+    <script src="../angular-animate/angular-animate.js"></script>
+    <script src="../angular-aria/angular-aria.js"></script>
+    <script src="../angular-material/angular-material.js"></script>
+    <script src="../volunteers/volunteerManagement.js"></script>
+</head>
+
+<body ng-controller="VolunteerManagementController">
+    
+    <div class="nav">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/vdb">Volunteers</a></li>
+            <li><a href="/vu">Users</a></li>
+        </ul>
+    </div>
+    
+    <div class="filter">
+        <select class="input-lg" ng-model="filterModel.criteriaType">
+            <option value="0" selected>Email Address</option>
+            <option value="1">Name</option>
+            <option value="2">Training</option>
+            <option value="3">Interests</option>
+            <option value="4">Availability</option>
+            <option value="5">Active Only</option>
+        </select>
+
+        <input type="text" class="input-lg" ng-model="filterModel.criteriaText" ng-show="filterModel.criteriaType=='0' || filterModel.criteriaType=='1'">
+        <select class="input-lg" ng-model="filterModel.criteriaTraining" ng-show="filterModel.criteriaType=='2'">
+            <option value="0:Cats">Cats</option>
+            <option value="1:Petsmart Cats">Petsmart Cats</option>
+            <option value="2:Dogs">Dogs</option>
+            <option value="3:Rabbits">Rabbits</option>
+            <option value="4:Smalls">Smalls</option>
+        </select>
+        <select class="input-lg" ng-model="filterModel.criteriaInterests" ng-show="filterModel.criteriaType=='3'">
+            <option value="0:Cats">Cats</option>
+            <option value="1:Dogs">Dogs</option>
+            <option value="2:Rabbits">Rabbits</option>
+            <option value="3:Smalls">Smalls</option>
+            <option value="4:Maintenance">Maintenance</option>
+            <option value="5:Fundraising">Fundraising</option>
+            <option value="6:Events">Events</option>
+        </select>
+        <select class="input-lg" ng-model="filterModel.criteriaAvailability" ng-show="filterModel.criteriaType=='4'">
+            <option value="0_0:Monday Morning">Monday Morning</option>
+            <option value="0_1:Monday Afternoon">Monday Afternoon</option>
+            <option value="0_2:Monday Evening">Monday Evening</option>  
+            <option value="1_0:Tuesday Morning">Tuesday Morning</option>
+            <option value="1_1:Tuesday Afternoon">Tuesday Afternoon</option>
+            <option value="1_2:Tuesday Evening">Tuesday Evening</option>
+            <option value="2_0:Wednesday Morning">Wednesday Morning</option>
+            <option value="2_1:Wednesday Afternoon">Wednesday Afternoon</option>
+            <option value="2_2:Wednesday Evening">Wednesday Evening</option>
+            <option value="3_0:Thursday Morning">Thursday Morning</option>
+            <option value="3_1:Thursday Afternoon">Thursday Afternoon</option>
+            <option value="3_2:Thursday Evening">Thursday Evening</option>  
+            <option value="4_0:Friday Morning">Friday Morning</option>
+            <option value="4_1:Friday Afternoon">Friday Afternoon</option>
+            <option value="4_2:Friday Evening">Friday Evening</option>
+            <option value="5_0:Saturday Morning">Saturday Morning</option>
+            <option value="5_1:Saturday Afternoon">Saturday Afternoon</option>
+            <option value="5_2:Saturday Evening">Saturday Evening</option>
+            <option value="6_0:Sunday Morning">Sunday Morning</option>
+            <option value="6_1:Sunday Afternoon">Sunday Afternoon</option>
+            <option value="6_2:Sunday Evening">Sunday Evening</option>
+        </select>
+        <button class="btn btn-primary btn-lg" ng-click="addCriteria()">Add Filter</button>
+        
+        <ul>
+            <li ng-repeat="f in filters"><span ng-click="removeCriteria($index)">[X]</span>{{f.summary}}</li>
+        </ul>
+        
+    </div>
+    
+    <table>
+        <thead>
+            <tr class="tableHeader">
+                <th>Name</th>
+                <th>Pref. Contact</th>
+                <th>Status</th>
+                <th>Interests</th>
+                <th>Availability</th>
+                <th>Donor?</th>
+                <th>Boarder?</th>
+                <th>Adopter?</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="v in volunteers" id="v._id" ng-click="editVolunteer(v)" ng-class="{'rowSelected' : volunteerSelected[v._id], 'disqualified' : hasDisqualifyingData(v)}">
+            <td>{{v.firstName}} {{v.lastName}}</td>
+            <td>{{formatPrefContact(v)}}</td>
+            <td>{{formatStatus(v)}}</td> 
+            <td>{{formatInterests(v)}}</td>  
+            <td> <span class="schedWrap">
+                  <div class="dotw">
+                      <div class="am {{getAvailabilityClass(v, 0, 0)}}"></div>
+                      <div class="md {{getAvailabilityClass(v, 0, 1)}}"></div>
+                      <div class="pm {{getAvailabilityClass(v, 0, 2)}}"></div>
+                  </div>
+                  <div class="dotw">
+                       <div class="am {{getAvailabilityClass(v, 1, 0)}}"></div>
+                      <div class="md {{getAvailabilityClass(v, 1, 1)}}"></div>
+                      <div class="pm {{getAvailabilityClass(v, 1, 2)}}"></div>
+                </div> 
+                  <div class="dotw">
+                      <div class="am {{getAvailabilityClass(v, 2, 0)}}"></div>
+                      <div class="md {{getAvailabilityClass(v, 2, 1)}}"></div>
+                      <div class="pm {{getAvailabilityClass(v, 2, 2)}}"></div>
+                  </div> 
+                  <div class="dotw">
+                      <div class="am {{getAvailabilityClass(v, 3, 0)}}"></div>
+                      <div class="md {{getAvailabilityClass(v, 3, 1)}}"></div>
+                      <div class="pm {{getAvailabilityClass(v, 3, 2)}}"></div>
+                  </div> 
+                  <div class="dotw">
+                      <div class="am {{getAvailabilityClass(v, 4, 0)}}"></div>
+                      <div class="md {{getAvailabilityClass(v, 4, 1)}}"></div>
+                      <div class="pm {{getAvailabilityClass(v, 4, 2)}}"></div>
+                  </div> 
+                  <div class="dotw">
+                      <div class="am {{getAvailabilityClass(v, 5, 0)}}"></div>
+                      <div class="md {{getAvailabilityClass(v, 5, 1)}}"></div>
+                      <div class="pm {{getAvailabilityClass(v, 5, 2)}}"></div>
+                  </div> 
+                  <div class="dotw">
+                      <div class="am {{getAvailabilityClass(v, 6, 0)}}"></div>
+                      <div class="md {{getAvailabilityClass(v, 6, 1)}}"></div>
+                      <div class="pm {{getAvailabilityClass(v, 6, 2)}}"></div>
+                  </div> 
+                </span>
+            </td>   
+            <td>{{v.donorData.gifts.length > 0 ? 'Yes' : 'No'}}</td>  
+            <td>{{v.boardingData ? 'Yes' : 'No'}}</td>  
+            <td>{{v.adopteeData.adoptions.length > 0 ? 'Yes' : 'No'}}</td>  
+        </tr>
+        </tbody>
+    </table>
+    
+    <!-- FORM TO enter/update new Volunteers -->
+    <div id="volun-form" class="row">
+        <div class="col-sm-8 col-sm-offset-2 text-center">
+            <form>
+                <input type="hidden" ng-model="formData._id">
+                <md-content>
+                    <md-tabs md-dynamic-height md-border-bottom>
+                        <md-tab label="General Information">
+                            <md-content>
+                                <div>
+                                    <div class="form-label">First Name : 
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.firstName">
+                                    </div>
+                                    <div class="form-label">Last Name : 
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.lastName">
+                                    </div>
+                                    <div class="form-label">Email : 
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.email">
+                                    </div>
+                                    <div class="form-label" style="height:80px;">Address : 
+                                        <textarea type="text" cols="40" rows="4" class="form-control input-lg text-center" ng-model="formData.address"></textarea>
+                                    </div>
+                                    <div class="form-label">Phone Number : 
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.phoneNumber">
+                                    </div>
+                                    <div class="form-label">SMS? : 
+                                        <input type="checkbox" class="form-control input-lg text-center" ng-model="formData.canGetSMS">
+                                    </div>
+                                    <div class="form-label">Contact Pref? (#) : 
+                                        <select class="form-control input-lg text-center" ng-model="formData.contactPreference">
+                                            <option value="0">Email</option>
+                                            <option value="1">Phone</option>
+                                            <option value="2">SMS</option>
+                                        </select> 
+                                    </div>
+                                </div>
+                            </md-content>
+                        </md-tab>
+                        <md-tab label="Volunteering Data">
+                            <md-content>
+                                <div class="form-group">
+                                    <div class="form-group-header">General Information :</div>
+                                    <div>
+                                        <div class="form-label">Active : 
+                                            <input type="checkbox" class="form-control input-lg text-center" ng-model="formData.active">
+                                        </div>
+                                        <div class="form-label">Special Needs : 
+                                            <input type="checkbox" class="form-control input-lg text-center" ng-model="formData.specialNeeds">
+                                        </div>
+                                        <div class="form-label">Birthday : 
+                                            <input type="date" class="form-control input-lg text-center" ng-model="formData.birthday">
+                                        </div>
+                                        <div class="form-label">Started : 
+                                            <input type="date" class="form-control input-lg text-center" ng-model="formData.started">
+                                        </div>
+                                        <div class="form-label">Last Seen : 
+                                            <input type="date" class="form-control input-lg text-center" ng-model="formData.lastSeen">
+                                        </div>
+                                        <div class="form-label">Hours Worked : 
+                                            <input type="text" class="form-control input-lg text-center" ng-model="formData.hoursWorked">
+                                        </div>
+                                        <div class="form-label">Notes : 
+                                            <input type="text" class="form-control input-lg text-center" ng-model="formData.notes">
+                                        </div>
+                                        <div class="form-label">Guardian(s) : 
+                                            <input type="text" class="form-control input-lg text-center" ng-model="formData.partners">
+                                        </div>
+                                        <div class="form-label">Emergency Contact : 
+                                            <input type="text" class="form-control input-lg text-center" ng-model="formData.emergencyContactName">
+                                        </div>
+                                        <div class="form-label">Emergency Contact Phone : 
+                                            <input type="text" class="form-control input-lg text-center" ng-model="formData.emergencyContactNumber">
+                                        </div>
+                                        <div class="form-label">Emer. Contact Relationship : 
+                                            <input type="text" class="form-control input-lg text-center" ng-model="formData.emergencyContactRelationship">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div style="display:inline-block;width:40%;">
+                                        <div class="form-group-header">Status :</div>
+                                        <div class="form-label">Waiver Collected?
+                                            <input type="checkbox" class="form-control input-lg text-center" ng-model="formData.statuswaiver">
+                                        </div>
+                                        <div class="form-label">Completed Orientation?
+                                            <input type="date" class="form-control input-lg text-center" ng-model="formData.statusoriented">
+                                        </div>
+                                        <div class="form-label">Trained for Cats?
+                                            <input type="date" class="form-control input-lg text-center" ng-model="formData.statustrainedCats">
+                                        </div>
+                                        <div class="form-label">Trained for PETSMART Cats?
+                                            <input type="date" class="form-control input-lg text-center" ng-model="formData.statustrainedCatsPetsmart">
+                                        </div>
+                                        <div class="form-label">Trained for Dogs?
+                                            <input type="date" class="form-control input-lg text-center" ng-model="formData.statustrainedDogs">
+                                        </div>
+                                        <div class="form-label">Trained for Rabbits?
+                                            <input type="date" class="form-control input-lg text-center" ng-model="formData.statustrainedRabbit">
+                                        </div>
+                                        <div class="form-label">Trained for Smalls?
+                                            <input type="date" class="form-control input-lg text-center" ng-model="formData.statustrainedSmalls">
+                                        </div>
+                                    </div>
+                                    <div style="display:inline-block;width:40%;vertical-align:top;margin-left:25px">
+                                        <div class="form-group-header" >Interests :</div>
+                                        <div class="form-label">Cats?
+                                            <input type="text" class="form-control input-lg text-center" ng-model="formData.interestscats">
+                                        </div>
+                                        <div class="form-label">Dogs?
+                                            <input type="text" class="form-control input-lg text-center" ng-model="formData.interestsdogs">
+                                        </div>
+                                        <div class="form-label">Rabbits?
+                                            <input type="text" class="form-control input-lg text-center" ng-model="formData.interestsrabbits">
+                                        </div>
+                                        <div class="form-label">Smalls?
+                                            <input type="text" class="form-control input-lg text-center" ng-model="formData.interestssmalls">
+                                        </div>
+                                        <div class="form-label">Maintenance?
+                                            <input type="text" class="form-control input-lg text-center" ng-model="formData.interestsmaintenance">
+                                        </div>
+                                        <div class="form-label">Fundraising?
+                                            <input type="text" class="form-control input-lg text-center" ng-model="formData.interestsfundraising">
+                                        </div>
+                                        <div class="form-label">Events?
+                                            <input type="text" class="form-control input-lg text-center" ng-model="formData.interestsevents">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="form-group-header">Availability :</div>
+                                    <div class="av-weekday">Monday
+                                        <div class="av-timeslot">  Morning :
+                                            <input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitymondaymorning">
+                                        </div>
+                                        <div class="av-timeslot">  Afternoon :
+                                            <input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitymondayafternoon">
+                                        </div>
+                                        <div class="av-timeslot">  Evening :
+                                            <input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitymondayevening">
+                                        </div>
+                                    </div>
+                                    <div class="av-weekday">Tueday
+                                        <div class="av-timeslot">  Morning :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitytuesdaymorning"></div>
+                                        <div class="av-timeslot">  Afternoon :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitytuesdayafternoon"></div>
+                                        <div class="av-timeslot">  Evening :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitytuesdayevening"></div>
+                                    </div>
+                                    <div class="av-weekday">Wednesday
+                                        <div class="av-timeslot">  Morning :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitywednesdaymorning"></div>
+                                        <div class="av-timeslot">  Afternoon :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitywednesdayafternoon"></div>
+                                        <div class="av-timeslot">  Evening :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitywednesdayevening"></div>
+                                    </div>
+                                    <div class="av-weekday">Thursday
+                                        <div class="av-timeslot">  Morning :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitythursdaymorning"></div>
+                                        <div class="av-timeslot">  Afternoon :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitythursdayafternoon"></div>
+                                        <div class="av-timeslot">  Evening :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitythursdayevening"></div>
+                                    </div>
+                                    <div class="av-weekday">Friday
+                                        <div class="av-timeslot">  Morning :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilityfridaymorning"></div>
+                                        <div class="av-timeslot">  Afternoon :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilityfridayafternoon"></div>
+                                        <div class="av-timeslot">  Evening :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilityfridayevening"></div>
+                                    </div>                
+                                    <div class="av-weekend">Saturday
+                                        <div class="av-timeslot">  Morning :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitysaturdaymorning"></div>
+                                        <div class="av-timeslot">  Afternoon :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitysaturdayafternoon"></div>
+                                        <div class="av-timeslot">  Evening :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitysaturdayevening"></div>
+                                    </div>
+                                    <div class="av-weekend">Sunday
+                                        <div class="av-timeslot">  Morning :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitysundaymorning"></div>
+                                        <div class="av-timeslot">  Afternoon :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitysundayafternoon"></div>
+                                        <div class="av-timeslot">  Evening :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitysundayevening"></div>
+                                    </div>
+                                    <div class="form-label" style="margin-bottom:30px;margin-top:10px;">Notes : 
+                                        <textarea type="text" cols="70" rows="2" class="form-control input-lg text-center" ng-model="formData.availabilitynotes"></textarea>
+                                    </div>
+                                </div>
+                            </md-content>
+                        </md-tab>
+                        <md-tab label="Donor Data">
+                            <md-content>
+                                have to figure out how I want to pass and deal with the list of donations. are all past donations editable? Or is 
+                                this just the ability to add a new one
+                                <div class="form-label">Donation $
+                                    <input type="text" class="form-control input-lg text-center" ng-model="formData.donationAmount">
+                                </div>
+                                <div class="form-label">Donation Date
+                                    <input type="date" class="form-control input-lg text-center" ng-model="formData.donationDate">
+                                </div>
+                            </md-content>
+                        </md-tab>
+                        <md-tab label="Boarding Data">
+                            <md-content>
+                                <div class="form-label">Last Boarding Date
+                                    <input type="date" class="form-control input-lg text-center" ng-model="formData.boardingDate">
+                                </div>
+                                <div class="form-label">Notes
+                                    <input type="text" class="form-control input-lg text-center" ng-model="formData.boardingNotes">
+                                </div>
+                            </md-content>
+                        </md-tab>
+                        <md-tab label="Adopting Data">
+                            <md-content>
+                                same issue as donations - this is probably a list of things (though is anyone going to keep it all up to date?)
+                                <div class="form-label">Adoption Date
+                                    <input type="date" class="form-control input-lg text-center" ng-model="formData.adoptingDate">
+                                </div>
+                                <div class="form-label">Name
+                                    <input type="text" class="form-control input-lg text-center" ng-model="formData.adopteeName">
+                                </div>
+                                <div class="form-label">Kind (dropdown?)
+                                    <input type="text" class="form-control input-lg text-center" ng-model="formData.adopteeKind">
+                                </div>
+                            </md-content>
+                        </md-tab>
+                        <md-tab label="Disqualifying Data">
+                            <md-content>
+                                Place to note any adverse events associated with the name, address, or email address for future reference.
+                                <div class="form-label">Surrendered an Animal on  :
+                                    <input type="date" class="form-control input-lg text-center" ng-model="formData.dqSurrenderDate">
+                                </div>
+                                <div class="form-label">Failed a Vet Check on : 
+                                    <input type="date" class="form-control input-lg text-center" ng-model="formData.dqFailedVetDate">
+                                </div>
+                                <div class="form-label">Failed a Home Check on : 
+                                    <input type="date" class="form-control input-lg text-center" ng-model="formData.dqFailedHomeDate">
+                                </div>
+                                <div class="form-label">Notes  : 
+                                    <input type="text" class="form-control input-lg text-center" ng-model="formData.dqNotes">
+                                </div>
+                            </md-content>
+                        </md-tab>
+                    </md-tabs>
+                </md-content>
+                <button type="submit" class="btn btn-primary btn-lg" ng-click="upsertVolunteer()">Add/Update</button>
+                <button type="submit" class="btn btn-primary btn-lg" ng-click="clearForm()">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-lg" ng-click="deleteRecord()">Delete</button>
+                
+            </form>
+        </div>
+    </div>
+    
+</body>
+
+
+</html>

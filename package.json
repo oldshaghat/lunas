@@ -11,12 +11,17 @@
   "author": "Mike Bush <oldshaghat@gmail.com>",
   "license": "UNLICENSED",
   "dependencies": {
-    "express": "latest",
-    "express-session": "latest",
-    "express-validator": "latest",
-    "nodemailer": "latest",
-    "passport": "latest",
-    "passport-local": "latest",
-    "bower":"latest"
+    "express":          "latest",
+    "cookie-parser":    "latest",
+    "body-parser":      "latest",
+    "express-session":  "latest",
+    "express-validator":"latest",
+    "nodemailer":       "latest",
+    "passport":         "latest",
+    "passport-local":   "latest",
+    "bower":            "latest",
+    "mongodb" :         "latest",
+    "mongoose" :        "latest",
+    "crypto"    :       "latest"
   }
 }

@@ -2,12 +2,14 @@
   "name": "lunas-volunteers",
   "version": "1.0.4",
     "dependencies": {
-        "angular":          "1.2.16",
-        "angular-route":    "1.2.16",
-        "angular-sanitize": "1.2.16",
-        "angular-mocks":    "1.2.16",
-        "jquery":           "1.8.3",
-        "underscore":       "1.6.0"
+        "angular":          "1.6.1",
+        "angular-route":    "1.6.1",
+        "angular-sanitize": "1.6.1",
+        "angular-mocks":    "1.6.1",
+        "angular-material" : "latest",
+        "jquery":           "3.1.1",
+        "underscore":       "1.6.0",
+        "bootstrap" :       "3.0.0"
     },
     "analytics": false
 }
