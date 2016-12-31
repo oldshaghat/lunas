@@ -5,8 +5,7 @@
   "private": true,
   "main": "start.js",
   "scripts": {
-    "start": "node --use_strict start.js",
-    "postinstall" : "bower install"
+    "start": "node --use_strict start.js"
   },
   "author": "Mike Bush <oldshaghat@gmail.com>",
   "license": "UNLICENSED",
