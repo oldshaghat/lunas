@@ -34,7 +34,7 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
     
     $scope.getScheduleClass = function(dateOffset, assignment, timeslot) {
         for (var i = 0; i < $scope.schedule.length; i++) {
-            if ($scope.schedule[i].)
+            
         }
     };
     
