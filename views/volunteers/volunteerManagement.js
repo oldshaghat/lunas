@@ -1,8 +1,14 @@
 //eventually put dependencies in that array
-var volunteerManagement = angular.module('volunteerManagement', ['ngMaterial']);
+var volunteerManagement = angular.module('volunteerManagement', ['ngMaterial'])
+.config( [ '$compileProvider', function ( $compileProvider ) {
+  $compileProvider.preAssignBindingsEnabled( true );
+} ] );
 
 volunteerManagement.controller('VolunteerManagementController', function VolunteerManagementController($scope, $http) {
     $scope.volunteerSelected = [];
+    
+    $scope.minDate = new Date(1900,1,1);
+    $scope.maxDate = new Date(2100,1,1);
     
     function buildFilterString () {
         if (!$scope.filters || $scope.filters.length == 0)
@@ -22,7 +28,6 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
         var filterString = buildFilterString();
         $http.get('/api/volunteers' + filterString)
             .then(function(data) {
-                console.log(data);
                 $scope.volunteers = data.data;
             }, function(data) {
                 console.log(data);
@@ -178,14 +183,22 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
                         $scope.formData.statusoriented = new Date(vd.status.oriented);
                     if (vd.status.trainedCats)
                         $scope.formData.statustrainedCats = new Date(vd.status.trainedCats);
+                    if (vd.status.trainedCatsQuarantine)
+                        $scope.formData.statustrainedCatsQuarantine = new Date(vd.status.trainedCatsQuarantine);
                     if (vd.status.trainedCatsPetsmart)
                         $scope.formData.statustrainedCatsPetsmart = new Date(vd.status.trainedCatsPetsmart);
                     if (vd.status.trainedDogs)
                         $scope.formData.statustrainedDogs = new Date(vd.status.trainedDogs);
+                    if (vd.status.trainedDogsQuarantine)
+                        $scope.formData.statustrainedDogsQuarantine = new Date(vd.status.trainedDogsQuarantine);
                     if (vd.status.trainedRabbit)
                         $scope.formData.statustrainedRabbit = new Date(vd.status.trainedRabbit);
                     if (vd.status.trainedSmalls)
                         $scope.formData.statustrainedSmalls = new Date(vd.status.trainedSmalls);
+                    if (vd.status.trainedRabbitQuarantine)
+                        $scope.formData.statustrainedRabbitQuarantine = new Date(vd.status.trainedRabbitQuarantine);
+                    if (vd.status.trainedSmallsQuarantine)
+                        $scope.formData.statustrainedSmallsQuarantine = new Date(vd.status.trainedSmallsQuarantine);
                 }
             
                if (vd.interests) {
@@ -323,11 +336,11 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
         return "No Data";
     };
     $scope.formatInterests = function(v) {
-        if (!v) return 'N/A';
+        if (!v) return '';
         var vd = v.volunteerData;
-        if (!vd) return 'N/A';
+        if (!vd) return '';
         if (!vd.interests) {
-            return "N/A";
+            return "";
         }
         var i =[];
         i.push({n : 'C ', r : vd.interests.cats});
@@ -346,7 +359,7 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
             }
         }
         if (interestString.length ==0 )
-            return "None Specified";
+            return "";
         
         return interestString;
     };

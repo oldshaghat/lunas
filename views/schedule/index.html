@@ -13,7 +13,52 @@
 </head>
 
 <body ng-controller="ScheduleManagementController">
+    <div class="nav">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/vdb">Volunteers</a></li>
+            <li><a href="/vu">Users</a></li>
+            <li><a href="/sch">Schedule</a></li>
+        </ul>
+    </div>
     
+    <div>
+        <md-content>
+            <md-tabs md-dynamic-height md-border-bottom layout-padding>
+                <md-tab label="Month">
+                    <h4 style="text-align:center"><md-button ng-click="previousMonth()">&lt;</md-button>{{getMonthName()}}<md-button ng-click="nextMonth()">&gt;</md-button></h4>
+                    
+                </md-tab>
+                <md-tab label="Week">
+                    <h4 style="text-align:center"><md-button ng-click="previousWeek()">&lt;</md-button>{{getWeekStart().toDateString()}} - {{getWeekEnd().toDateString()}}<md-button ng-click="nextWeek()">&gt;</md-button></h4>
+                    
+                    
+                </md-tab>
+                <md-tab label="Day">
+                    <h4 style="text-align:center"><md-button ng-click="previousDay()">&lt;</md-button>{{viewingDate.toDateString()}}<md-button ng-click="nextDay()">&gt;</md-button></h4>
+                    
+                    <md-grid-list md-gutter="2px" md-cols="6" md-rows="4" md-row-height="120px">
+                        <md-grid-tile></md-grid-tile>
+                        <md-grid-tile class="headerTile cats"><md-grid-tile-footer>Cats</md-grid-tile-footer></md-grid-tile>
+                        <md-grid-tile class="headerTile catsP"><md-grid-tile-footer>Cats - Petsmart</md-grid-tile-footer></md-grid-tile>
+                        <md-grid-tile class="headerTile dogs"><md-grid-tile-footer>Dogs</md-grid-tile-footer></md-grid-tile>
+                        <md-grid-tile class="headerTile rabbits"><md-grid-tile-footer>Rabbits</md-grid-tile-footer></md-grid-tile>
+                        <md-grid-tile class="headerTile smalls"><md-grid-tile-footer>Smalls</md-grid-tile-footer></md-grid-tile>
+                        <md-grid-tile class="timeSlotHeaderTile">Morning</md-grid-tile>
+                        <md-grid-tile ng-repeat="i in [0,1,2,3,4]" ng-class="getScheduleClass(0,i,0)" ng-click="upsertSchedule(0,i,0)">{{getScheduleData(0,i,0)}}</md-grid-tile>
+                        <md-grid-tile class="timeSlotHeaderTile">Afternoon</md-grid-tile>
+                        <md-grid-tile ng-repeat="i in [0,1,2,3,4]" ng-class="getScheduleClass(0,i,1)" ng-click="upsertSchedule(0,i,1)">{{getScheduleData(0,i,1)}}</md-grid-tile>
+                        <md-grid-tile class="timeSlotHeaderTile">Evening</md-grid-tile>
+                        <md-grid-tile ng-repeat="i in [0,1,2,3,4]" ng-class="getScheduleClass(0,i,2)" ng-click="upsertSchedule(0,i,2)">{{getScheduleData(0,i,2)}}</md-grid-tile>
+                    </md-grid-list>
+                    
+
+                    
+                </md-tab>
+            </md-tabs>
+        </md-content>
+    </div>
+                    
 </body>
     
 </html>

@@ -35,9 +35,13 @@ var VolunteerSchema = new mongoose.Schema({
             oriented : Date,
             trainedCats : Date,
             trainedCatsPetsmart : Date,
+            trainedCatsQuarantine : Date,
             trainedDogs : Date,
+            trainedDogsQuarantine : Date,
             trainedRabbit : Date,
-            trainedSmalls : Date
+            trainedRabbitQuarantine : Date,
+            trainedSmalls : Date,
+            trainedSmallsQuarantine : Date
         },
     
         //0 or <0 : no interest; then 1 high priority .. 10 lower priority

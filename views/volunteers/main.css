@@ -15,22 +15,28 @@
     border : solid blue 1px;
 }
 
-td {
+.vlist > tbody > tr > td {
     border : solid black 1px;
     padding : 5px;
 }
-.tableHeader {
+.vlistHeader > th {
+    border : solid black 1px;
+}
+.vlistHeader {
     background-color: azure;
     border : solid black 2px;
     padding : 4px;
 }
 
-table {
+.vlist {
     border-collapse: collapse;
     margin-left : 25px;
     margin-top : 20px;
+    margin-bottom : 10px;
+    width : 90%;
+    border : solid black 1px;
 }
-tbody {
+.vlist > tbody {
     cursor : pointer;
 }
 
@@ -41,10 +47,14 @@ tbody {
     color : red;
 }
 
+#mainVformTabs {
+    background-color :aliceblue;
+}
+
 
 
 .schedWrap {
-    margin-left:8px;
+    margin-left:30%;
 }
 
 .dotw {
@@ -75,15 +85,6 @@ tbody {
   background-color : #00ee00;
 }
 
-form {
-    margin : 20px;
-    padding : 10px;
-}
-
-md-content {
-    margin : 20px;
-}
-
 .form-group {
     margin : 10px;
     border : solid 1px black;
@@ -102,7 +103,6 @@ md-content {
 }
 
 .av-weekday {
-    width : 120px;
     display : inline-block;
     border : 1px solid orange;
     text-align : left;
@@ -110,7 +110,6 @@ md-content {
 }
 
 .av-weekend {
-    width : 120px;
     display : inline-block;
     border : 1px solid blue;
     text-align : left;
@@ -121,10 +120,7 @@ md-content {
     text-align : right;
 }
 
-input, select, textarea {
-    float : right;
-    clear : both;
-}
+
 .filter > input, .filter > select {
     float:none;
     clear : none;

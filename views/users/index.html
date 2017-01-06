@@ -2,8 +2,13 @@
 <html ng-app="userManagement">
 
 <head>
+    <link href="bower/angular-material/angular-material.css" rel="stylesheet">
     <link href="../users/users.css" rel="stylesheet">
+
     <script src="bower/angular/angular.js"></script>
+    <script src="bower/angular-animate/angular-animate.js"></script>
+    <script src="bower/angular-aria/angular-aria.js"></script>
+    <script src="bower/angular-material/angular-material.js"></script>
     <script src="../users/userManagement.js"></script>
 </head>
 
@@ -14,45 +19,79 @@
             <li><a href="/">Home</a></li>
             <li><a href="/vdb">Volunteers</a></li>
             <li><a href="/vu">Users</a></li>
+            <li><a href="/sch">Schedule</a></li>
         </ul>
     </div>
-    
-    
-    <ul>
-        <li ng-repeat="user in users">
-            <div>{{user.username}}</div>
-            <div>{{user.email}}</div> 
-            <div>{{user.role}}</div> 
-            <button ng-click="editUser($index)">Edit</button>
-            <button ng-click="deleteUser($index)">Delete</button>
-        </li>
-    </ul>
+    <div>
+        <md-content>
+            <md-tabs md-dynamic-height md-border-bottom >
+                <md-tab label="Users">
+                    <md-content class="md-padding">
+                        <h3>Current listing of users and roles</h3>
+                            <md-card ng-repeat="user in users">
+                                <md-card-title>
+                                    <md-card-title-text>{{user.username}}</md-card-title-text>
+                                </md-card-title>
+                                <md-card-content>
+                                    <form>
+                                        <div layout-gt-sm="row">
+                                            <label>Email Address:</label><div ng-show="!user.editing">{{user.email}}</div>
+                                            <input ng-show="user.editing" type="text" ng-model="userData.email">
+                                        </div>
+                                        <div layout-gt-sm="row">
+                                            <label>Role:</label><div ng-show="!user.editing">{{user.role}}</div> 
+                                            <input ng-show="user.editing" type="text" ng-model="userData.role">
+                                        </div>
+                                    </form>
+                                </md-card-content>    
+                                <md-card-actions layout="row" layout-align="end-center">
+                                    <md-button ng-show="!user.editing" ng-click="editUser(user)">Edit</md-button>
+                                    <md-button ng-show="user.editing" ng-click="saveUser(user)">Save</md-button>
+                                    <md-button ng-click="deleteUser(user)">Delete</md-button>
+                                </md-card-actions>
+                            </md-card>
+                        </ul>
+                    </md-content>
+                </md-tab>
+                <md-tab label="Registration">
+                    <md-content class="md-padding">
+                        <h3>Add a new user</h3>
+                         <form action="/register" method="post">
+                             <div layout-gt-sm="row">
+                                <md-input-container class="md-block">
+                                    <label>Username:</label>
+                                    <input type="text" name="username"/>
+                                </md-input-container>
+                                <md-input-container class="md-block" >
+                                    <label>Password:</label>
+                                    <input type="password" name="password"/>
+                                </md-input-container>
+                             </div>
+                              <div layout-gt-sm="row">
+                                <md-input-container class="md-block" >
+                                    <label>Email Address:</label>
+                                    <input type="text" name="email"/>
+                                </md-input-container>
+                                <md-input-container class="md-block">
+                                    <label>Role : </label>
+                                    <input type="text" name="role"/>
+                                </md-input-container>
+                             </div>
+                             
+                            <div>
+                                <input type="submit" value="Register"/>
+                            </div>
+                        </form>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+        </md-content>
+    </div>    
+
     
     
 
-    
-    Register a new user:
-     <form action="/register" method="post">
-        <div>
-            <label>Username:</label>
-            <input type="text" name="username"/>
-        </div>
-        <div>
-            <label>Password:</label>
-            <input type="password" name="password"/>
-        </div>
-        <div>
-            <label>Email Address:</label>
-            <input type="text" name="email"/>
-        </div>
-        <div>
-            <label>Role : </label>
-            <input type="text" name="role"/>
-        </div>
-        <div>
-            <input type="submit" value="Register"/>
-        </div>
-    </form>
+
 </body>
 
 

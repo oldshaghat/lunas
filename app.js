@@ -17,7 +17,9 @@ const http         = require('http'),
       emailer      = require('nodemailer'),
       //load schemas
       userschema   = require('./schema/user'),
-      voluschema   = require('./schema/volunteer');
+      voluschema   = require('./schema/volunteer'),
+      schSchema    = require('./schema/schedule');
+
     
 
 var dbUrl = 'mongodb://localhost:27017/volunteers';
@@ -32,6 +34,7 @@ if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
 
 var User;
 var Volunteer;
+var Schedule;
 
 //TODO : create a new gmail account for volunteering . sources suggest that we can dispatch 99 emails a day this way.
 // we may have to do some configurating on the account to make this happen. 
@@ -55,6 +58,7 @@ db.once('open', function() {
     
     
     Volunteer = mongoose.model('Volunteer', voluschema.VolunteerSchema);
+    Schedule = mongoose.model('Schedule', schSchema.ScheduleSchema);
 });
 
 var app = express();
@@ -150,8 +154,19 @@ app.post('/api/users',
        verifyAuth,
        function(req, res) {
             //update a user  
-            
-            
+            if (req.body.id) {
+                 User.findOne({ _id: req.body.id }, 
+                            function (err, user) {
+                                 if (user) {
+                                     user.email = req.body.email;
+                                     user.role = req.body.role;
+                                     user.save(
+                                         function(err) {
+                                                if (err) console.log(err);
+                                            });
+                                 }
+                            });
+            }
             //return current list of users
             User.find(function(err, users) {
                 if (err) res.send(err); else
@@ -189,7 +204,7 @@ function buildCriteria(req) {
     }
     if (req.query.training) {
         var training = req.query.training;
-        //we expect this to be a # 0 .. 4
+        //we expect this to be a # 0 .. 8
         if (training == 0) {
             critList.push({'volunteerData.status.trainedCats' : {'$exists' : true}});
         } else if (training == 1) {
@@ -200,6 +215,14 @@ function buildCriteria(req) {
             critList.push({'volunteerData.status.trainedRabbit' : {'$exists' : true}});
         } else if (training == 4) {
             critList.push({'volunteerData.status.trainedSmalls' : {'$exists' : true}});
+        } else if (training == 5) {
+            critList.push({'volunteerData.status.trainedCatsQuarantine' : {'$exists' : true}});
+        } else if (training == 6) {
+            critList.push({'volunteerData.status.trainedDogsQuarantine' : {'$exists' : true}});
+        } else if (training == 7) {
+            critList.push({'volunteerData.status.trainedRabbitQuarantine' : {'$exists' : true}});
+        } else if (training == 8) {
+            critList.push({'volunteerData.status.trainedSmallsQuarantine' : {'$exists' : true}});
         }
     }
     if (req.query.interests) {
@@ -325,7 +348,11 @@ app.post('/api/volunteers/' ,
                             trainedCatsPetsmart : req.body.statustrainedCatsPetsmart,
                             trainedDogs : req.body.statustrainedDogs,
                             trainedRabbit : req.body.statustrainedRabbit,
-                            trainedSmalls : req.body.statustrainedSmalls
+                            trainedSmalls : req.body.statustrainedSmalls,
+                            trainedCatsQuarantine : req.body.statustrainedCatsQuarantine,
+                            trainedDogsQuarantine : req.body.statustrainedDogsQuarantine,
+                            trainedRabbitQuarantine : req.body.statustrainedRabbitQuarantine,
+                            trainedSmallsQuarantine : req.body.statustrainedSmallsQuarantine
                         },
 
                         interests : {
@@ -437,6 +464,85 @@ app.delete('/api/volunteers/' ,
                 });
 });
 
+
+///////////////////////////
+///// Schedule API
+
+app.get('/api/schedule/:year/:month', 
+       verifyAuth,
+       function (req, res) {
+            var criteria = {};
+            criteria['year'] = year;
+            criteria['month'] = month;
+            Schedule.find(criteria, function(err, vtrs) {
+                    if (err) res.send(err);
+                    res.json(vtrs);
+                });
+});
+
+//assume form data in body is either new event or edit of existing event
+//should we also allow posting to api/schedule/2017/11/ ? 
+app.post('/api/schedule', 
+       verifyAuth,
+       function (req, res) {
+            //check for upserts
+            var oid = req.body._id;
+            if (!oid) {
+                oid = new mongoose.mongo.ObjectID();
+            }
+            var validatedTeamSize = 1;
+            if (req.body.teamSize) {
+                validatedTeamSize = req.body.teamSize;
+            }
+            //if the form passes a date object, extract these values instead of the year/month/day set
+            var valYear = req.body.year;
+            var valMonth = req.body.month;
+            var valDate = req.body.day;
+            if (req.body.scheduledDate) {
+                valYear = req.body.scheduledDate.getFullYear();
+                valMonth = req.body.scheduledDate.getMonth();
+                valDate = req.body.scheduledDate.getDate();
+            }
+
+            Schedule.findOneAndUpdate(
+                { _id : oid },
+                {
+                    volunteerId : req.body.volunteerId,
+                    volunteerInitials : req.body.volunteerInitials,
+                    year : valYear,
+                    month : valMonth,
+                    dayOfMonth : valDate,
+                    timeslot : req.body.timeslot,               // 0, 1, 2 : Morning, Afternoon, Evening
+                    assignment : req.body.assignment,           //0 cats, 1 catsP, 2 dogs, 3 rab, 4 smalls
+                    teamSize : validatedTeamSize,               //how many people in the team (usually 1 but parent child or whatever counts as more)
+                    notes : req.body.notes                      //optional text to accompany event - like fixed arrival time if a Tuesday
+                },
+                { upsert : true },
+                 
+                function(err, sch) {
+                    if (err) {
+                        console.log(err);
+                        res.redirect('/sch'); 
+                    } else {
+                        res.json(sch);
+                    }
+                });
+});
+
+//delete an event by id
+app.delete('/api/schedule', 
+       verifyAuth,
+       function (req, res) {
+            if (!req.query.id) {
+                res.redirect('/sch'); 
+            }
+            Schedule.remove(
+                { _id : req.query.id },
+                function (err, r) {
+                    res.json(r);
+                });
+    
+});
 //////////////////////////////////////////
 ////// Views / pages
 
@@ -473,7 +579,7 @@ app.post('/register',
             User.findOne({ username: req.body.username }, function (err, user) {
                       if (err) { return res.redirect('/');; }
                       if (!user) {
-                            createUser(req.body.username, req.body.password);
+                            createUser(req.body.username, req.body.password, req.body.email, req.body.role);
                             res.sendStatus(200);
                       }
                     });
