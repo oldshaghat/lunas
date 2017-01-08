@@ -113,6 +113,9 @@ function verifyAuth(req,res,next) {
 };
 
 function validateNumber(n, defaultValue) {
+    if (typeof n === "undefined") {
+        return defaultValue;
+    }
     if (Number.isFinite(n)) {
         return n;
     }
@@ -198,6 +201,7 @@ function buildCriteria(req) {
         critList.push({'email' : new RegExp(req.query.email, 'i')});
     }
     if (req.query.name) {
+        //if name term contains a space they might be typing a first name part and a last name part or vice versa (search for smith bob vs bob smith)
         //look at first or last name
         var reg = new RegExp(req.query.name, 'i');
         critList.push({'$or' : [ {'firstName' : reg}, {'lastName' : reg}]});
@@ -205,44 +209,20 @@ function buildCriteria(req) {
     if (req.query.training) {
         var training = req.query.training;
         //we expect this to be a # 0 .. 8
-        if (training == 0) {
-            critList.push({'volunteerData.status.trainedCats' : {'$exists' : true}});
-        } else if (training == 1) {
-            critList.push({'volunteerData.status.trainedCatsPetsmart' : {'$exists' : true}});
-        } else if (training == 2) {
-            critList.push({'volunteerData.status.trainedDogs' : {'$exists' : true}});
-        } else if (training == 3) {
-            critList.push({'volunteerData.status.trainedRabbit' : {'$exists' : true}});
-        } else if (training == 4) {
-            critList.push({'volunteerData.status.trainedSmalls' : {'$exists' : true}});
-        } else if (training == 5) {
-            critList.push({'volunteerData.status.trainedCatsQuarantine' : {'$exists' : true}});
-        } else if (training == 6) {
-            critList.push({'volunteerData.status.trainedDogsQuarantine' : {'$exists' : true}});
-        } else if (training == 7) {
-            critList.push({'volunteerData.status.trainedRabbitQuarantine' : {'$exists' : true}});
-        } else if (training == 8) {
-            critList.push({'volunteerData.status.trainedSmallsQuarantine' : {'$exists' : true}});
-        }
+        var fields = ['trainedCats', 'trainedCatsPetsmart', 'trainedDogs', 'trainedRabbit', 'trainedSmalls', 'trainedCatsQuarantine', 'trainedDogsQuarantine', 'trainedRabbitQuarantine', 'trainedSmallsQuarantine'];
+        var fname = 'volunteerData.status.' + fields[training];
+        var c = {};
+        c[fname] = {'$exists' : false};
+        critList.push(c);
     }
     if (req.query.interests) {
         var interests = req.query.interests;
         //we expect this to be a # 0 .. 6
-        if (interests == 0) {
-            critList.push({'volunteerData.interests.cats' : {'$gt' : 0}});
-        } else if (interests == 1) {
-            critList.push({'volunteerData.interests.dogs' : {'$gt' : 0}});
-        } else if (interests == 2) {
-            critList.push({'volunteerData.interests.rabbits' : {'$gt' : 0}});
-        } else if (interests == 3) {
-            critList.push({'volunteerData.interests.smalls' : {'$gt' : 0}});
-        } else if (interests == 4) {
-            critList.push({'volunteerData.interests.maintenance' : {'$gt' : 0}});
-        } else if (interests == 5) {
-            critList.push({'volunteerData.interests.fundraising' : {'$gt' : 0}});
-        } else if (interests == 6) {
-            critList.push({'volunteerData.interests.events' : {'$gt' : 0}});
-        }
+        var fields = ['cats', 'dogs', 'rabbits', 'smalls', 'maintenance', 'fundraising', 'events'];
+        var fname = 'volunteerData.interests.' + fields[interests];
+        var c = {}; 
+        c[fname] = {'$gt' : 0};
+        critList.push(c);
     }
     if (req.query.availability) {
         var av = req.query.availability;
@@ -307,6 +287,7 @@ app.post('/api/volunteers/' ,
                 
             //VALIDATION / defaulting
             var hoursValue = validateNumber(req.body.hoursWorked, 0); 
+            var validatedNoShows = validateNumber(req.body.noShows, 0);
             var prefContact = validateNumber(req.body.contactPreference, 0); 
             var iCat = validateNumber(req.body.interestscats, -1);  
             var iDog = validateNumber(req.body.interestsdogs, -1);  
@@ -323,7 +304,11 @@ app.post('/api/volunteers/' ,
                     firstName : req.body.firstName,
                     lastName : req.body.lastName,
                     address : req.body.address,
+                    city : req.body.city,
+                    state : req.body.state,
+                    zip : req.body.zip,
                     phoneNumber : req.body.phoneNumber,
+                    alternatePhoneNumber : req.body.altPhoneNumber,
                     canGetSMS : req.body.canGetSMS,
                     contactPreference : prefContact,
 
@@ -331,12 +316,16 @@ app.post('/api/volunteers/' ,
                     volunteerData : {
                         activeVolunteer : req.body.active,
                         specialNeeds : req.body.specialNeeds,
+                        foster : req.body.foster,
+                        fostering : req.body.fostering,
+                        noShows : validatedNoShows,
                         birthday : req.body.birthday,
                         started : req.body.started,
                         lastSeen : req.body.lastSeen,
                         hoursWorked : hoursValue,
                         notes : req.body.notes,
                         partners : req.body.partners,
+                        dependents : req.body.dependents,
                         emergencyContactName : req.body.emergencyContactName,
                         emergencyContactNumber : req.body.emergencyContactNumber,
                         emergencyContactRelationship   : req.body.emergencyContactRelationship,
@@ -453,6 +442,8 @@ app.delete('/api/volunteers/' ,
                     res.json(vtrs);
                 });
             }
+            //Also / first remove this volunteer from any schedules
+            Schedule.remove ({volunteerId : req.query.id}).exec();
             Volunteer.remove(
                 { _id : req.query.id },
                 function (err, r) {
@@ -472,11 +463,12 @@ app.get('/api/schedule/:year/:month',
        verifyAuth,
        function (req, res) {
             var criteria = {};
-            criteria['year'] = year;
-            criteria['month'] = month;
-            Schedule.find(criteria, function(err, vtrs) {
+            
+            criteria['year'] = req.params.year;
+            criteria['month'] = req.params.month;
+            Schedule.find(criteria, function(err, scheduledItems) {
                     if (err) res.send(err);
-                    res.json(vtrs);
+                    res.json(scheduledItems);
                 });
 });
 
@@ -490,10 +482,10 @@ app.post('/api/schedule',
             if (!oid) {
                 oid = new mongoose.mongo.ObjectID();
             }
-            var validatedTeamSize = 1;
-            if (req.body.teamSize) {
-                validatedTeamSize = req.body.teamSize;
-            }
+            var validatedTeamSize = validateNumber(req.body.teamSize, 1);
+            var validatedTimeSlot = validateNumber(req.body.timeslot, 0);
+            var validatedAssignment = validateNumber(req.body.assignment, 0);
+
             //if the form passes a date object, extract these values instead of the year/month/day set
             var valYear = req.body.year;
             var valMonth = req.body.month;
@@ -508,14 +500,14 @@ app.post('/api/schedule',
                 { _id : oid },
                 {
                     volunteerId : req.body.volunteerId,
-                    volunteerInitials : req.body.volunteerInitials,
                     year : valYear,
                     month : valMonth,
                     dayOfMonth : valDate,
-                    timeslot : req.body.timeslot,               // 0, 1, 2 : Morning, Afternoon, Evening
-                    assignment : req.body.assignment,           //0 cats, 1 catsP, 2 dogs, 3 rab, 4 smalls
+                    timeslot : validatedTimeSlot,               // 0, 1, 2 : Morning, Afternoon, Evening
+                    assignment : validatedAssignment,           //0 cats, 1 catsP, 2 dogs, 3 rab, 4 smalls
                     teamSize : validatedTeamSize,               //how many people in the team (usually 1 but parent child or whatever counts as more)
-                    notes : req.body.notes                      //optional text to accompany event - like fixed arrival time if a Tuesday
+                    notes : req.body.notes,                      //optional text to accompany event - like fixed arrival time if a Tuesday
+                    arrivalTime : req.body.arrivalTime
                 },
                 { upsert : true },
                  
@@ -539,10 +531,37 @@ app.delete('/api/schedule',
             Schedule.remove(
                 { _id : req.query.id },
                 function (err, r) {
+                     if (err) {
+                        console.log(err);
+                     }
                     res.json(r);
                 });
     
 });
+
+
+///////// Mongo Can't Join -- Joey doesn't share food ///////
+app.post('/api/vsj',
+       verifyAuth, 
+       function(req, res) {
+            var idList = req.body.ids;
+            if (idList) {
+                var oidList = idList.map(function(id) { return new mongoose.mongo.ObjectID(id)});
+                var criteria = {'_id' : { '$in' : oidList}};
+                //we don't want everything
+                var projection = { 'firstName' : 1, 'lastName' : 1, 'volunteerData.status' : 1 };
+                
+                Volunteer.find(criteria, projection, function (err, results) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    res.json(results);
+                });
+            }
+    
+});
+
+
 //////////////////////////////////////////
 ////// Views / pages
 

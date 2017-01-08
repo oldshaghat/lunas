@@ -32,3 +32,48 @@
 .smalls {
     background-color : limegreen;
 }
+
+.unscheduled {
+    background-color : lightgray;
+}
+
+.outOfBoundsDay {
+    background-color : lightcyan;
+}
+
+.monthSlot {
+    height : 20px;
+    width : 20px;
+}
+.monthDayFooter {
+    height : 24px;
+    text-align : center;
+    width:100%;
+}
+.weekSlot {
+    height : 20px;
+    width : 20px;
+}
+.weekDayFooter {
+    height : 24px;
+    text-align : center;
+    width:100%;
+}
+
+.booking {
+    text-align: center;
+    padding: 6px;
+    border-radius: 10px;
+    border: solid 1px grey;
+    cursor: pointer;
+    margin: 1px;
+}
+
+.addNewBooking {
+    text-align: center;
+    padding: 6px;
+    border-radius: 10px;
+    border: solid 1px lightgray;
+    cursor: pointer;
+    margin: 1px;
+}

@@ -10,7 +10,11 @@ var VolunteerSchema = new mongoose.Schema({
     firstName : String,
     lastName : String,
     address : String,
+    city : String,
+    state : String,
+    zip : String,
     phoneNumber : String,
+    alternatePhoneNumber : String,
     canGetSMS : Boolean,
     contactPreference : Number, //0 : Email, 1 : Phone, 2 : TxtMsg (implies canGetSMS?)
 
@@ -18,12 +22,16 @@ var VolunteerSchema = new mongoose.Schema({
     volunteerData : {
         activeVolunteer : Boolean,
         specialNeeds : Boolean,
+        foster : Boolean,
+        fostering : String,
+        noShows : Number,
         birthday : Date,
         started : Date,
         lastSeen : Date, //or ... active? 
         hoursWorked : Number,  //wee bit of future proofing
         notes : String,
-        partners : String,  //string or name ... weak reference
+        partners : String,  //who supervises me (if anyone)
+        dependents : String, //who do I supervise (if anyone)
         emergencyContactName : String,
         emergencyContactNumber : String,
         emergencyContactRelationship : String,

@@ -158,7 +158,7 @@
                 <input type="hidden" ng-model="formData._id">
                 <md-content>
                     <md-tabs id="mainVformTabs" md-dynamic-height md-border-bottom>
-                        <md-tab label="General Information">
+                        <md-tab label="Contact Information">
                             <md-content layout-padding>
                                 <div layout-gt-sm="row">
                                     <md-input-container class="md-block" flex-gt-sm>
@@ -177,7 +177,25 @@
                                 <div layout-gt-sm="row">
                                     <md-input-container class="md-block" flex-gt-sm>
                                         <label>Address</label>
-                                        <textarea type="text" cols="40" rows="4" class="form-control input-lg text-center" ng-model="formData.address"></textarea>
+                                        <textarea type="text" cols="40" rows="2" class="form-control input-lg text-center" ng-model="formData.address"></textarea>
+                                    </md-input-container>
+                                </div>
+                                <div layout-gt-sm="row">
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>City</label>
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.city">
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex="15">
+                                        <label>State</label>
+                                        <md-select ng-model="formData.state">
+                                          <md-option ng-repeat="state in states" value="{{state.abbrev}}">
+                                            {{state.abbrev}}
+                                          </md-option>
+                                        </md-select>
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Zip Code</label>
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.zip">
                                     </md-input-container>
                                 </div>
                                 <div layout-gt-sm="row">
@@ -186,6 +204,11 @@
                                         <input type="text" class="form-control input-lg text-center" ng-model="formData.phoneNumber">
                                     </md-input-container>
                                     <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Alt. Phone Number</label>
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.altPhoneNumber">
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <md-tooltip>Set true if they can receive text messages on the primary phone number.</md-tooltip>
                                         <md-checkbox ng-model="formData.canGetSMS" aria-label="SMS?">
                                             SMS?
                                         </md-checkbox>
@@ -213,6 +236,13 @@
                                                 <md-input-container flex-gt-sm="15">
                                                     <md-checkbox ng-model="formData.specialNeeds" aria-label="Special Needs?">Special Needs?</md-checkbox>
                                                 </md-input-container>
+                                                <md-input-container flex-gt-sm="15">
+                                                    <md-checkbox ng-model="formData.foster" aria-label="Foster?">Foster?</md-checkbox>
+                                                </md-input-container>
+                                                <md-input-container class="md-block" flex ng-show="formData.foster">
+                                                    <label>Fostering</label>
+                                                    <input type="text" ng-model="formData.fostering">
+                                                </md-input-container>
                                                 <md-input-container class="md-block" flex-gt-sm>
                                                     <label>Birthday</label>
                                                     <md-datepicker ng-model="formData.birthday"></md-datepicker>
@@ -221,13 +251,19 @@
                                                     <label>Started</label>
                                                     <md-datepicker ng-model="formData.started"></md-datepicker>
                                                 </md-input-container>
-                                                <md-input-container class="md-block" flex-gt-sm>
+                                            </div>
+                                            <div layout-gt-sm="row">
+                                                <md-input-container class="md-block" flex="20">
                                                     <label>Last Seen</label>
                                                     <md-datepicker ng-model="formData.lastSeen"></md-datepicker>
                                                  </md-input-container>
-                                                <md-input-container class="md-block" flex-gt-sm>
+                                                <md-input-container class="md-block" flex="20">
                                                     <label>Hours Worked</label>
                                                     <input type="text" ng-model="formData.hoursWorked">
+                                                 </md-input-container>
+                                                 <md-input-container class="md-block" flex="20">
+                                                    <label># No Shows</label>
+                                                    <input type="text" ng-model="formData.noShows">
                                                  </md-input-container>
                                             </div>
                                             <div layout-gt-sm="row">
@@ -239,7 +275,13 @@
                                             <div layout-gt-sm="row">
                                                 <md-input-container class="md-block" flex-gt-sm>
                                                     <label>Guardian(s)</label>
+                                                    <md-tooltip>Names of people that can supervise this volunteer</md-tooltip>
                                                     <input type="text" ng-model="formData.partners">
+                                                 </md-input-container>
+                                                 <md-input-container class="md-block" flex-gt-sm>
+                                                    <label>Guardian for</label>
+                                                    <md-tooltip>Names of people that are <strong>supervised</strong> by this volunteer</md-tooltip>
+                                                    <input type="text" ng-model="formData.dependents">
                                                  </md-input-container>
                                             </div>
                                             <div layout-gt-sm="row">

@@ -1,0 +1,76 @@
+<md-dialog aria-label="Schedule Edit">
+
+    <form>
+    
+        <md-toolbar>
+            <div class="md-toolbar-tools {{titleBarClass}}">
+                <h2>{{title}}</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" style="color:red;" ng-click="cancel()">
+                    <md-tooltip>Cancel editing this data. You can also just click outside the dialog to cancel.</md-tooltip>
+                  X
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <div layout-gt-sm="row">
+                    <input type="hidden" ng-model="formData.id">
+                    <md-autocomplete flex required
+                        md-no-cache="true"
+                        md-delay="200"
+                        md-selected-item="formData.selectedVolunteer"
+                        md-search-text="searchText"
+                        md-items="item in querySearch(searchText)"
+                        md-item-text="item.display"
+                        md-require-match="true"
+                        md-floating-label="Volunteer Team Lead">
+                      <md-item-template>
+                        <span md-highlight-text="searchText">{{item.display}}</span>
+                      </md-item-template>
+                      <md-not-found>
+                        No volunteers matching "{{searchText}}" were found.
+                      </md-not-found>
+                    </md-autocomplete>
+                </div>
+                <div layout-gt-sm="row">
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>Team Size</label>
+                        <input type="text" ng-model="formData.teamsize">
+                    </md-input-container>
+                </div>
+                <div layout-gt-sm="row">
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>Arrival Time</label>
+                        <input type="text" ng-model="formData.arrivalTime">
+                    </md-input-container>
+                </div>
+                <div layout-gt-sm="row">
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>Notes</label>
+                        <input type="text" ng-model="formData.notes">
+                    </md-input-container>
+                </div>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+
+            <span flex></span>
+            <md-button ng-show="formData.id" ng-click="noshow()">
+                <md-tooltip>Record a no-show for the volunteer lead</md-tooltip>
+                No Show
+            </md-button>
+            <md-button ng-show="formData.id" ng-click="delete()">
+                <md-tooltip>Remove just this scheduled spot (call outs, etc)</md-tooltip>
+                Remove
+            </md-button>
+            <md-button ng-show="formData.id" ng-click="deleteAll()">
+                <md-tooltip>Remove this and all future schedule spots for this volunteer</md-tooltip>
+                Remove All
+            </md-button>
+            <md-button ng-click="answer(formData)">
+                Save
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

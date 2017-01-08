@@ -10,6 +10,12 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
     $scope.minDate = new Date(1900,1,1);
     $scope.maxDate = new Date(2100,1,1);
     
+    $scope.states = ('AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS ' +
+    'MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI ' +
+    'WY').split(' ').map(function(state) {
+        return {abbrev: state};
+      });
+    
     function buildFilterString () {
         if (!$scope.filters || $scope.filters.length == 0)
             return "";  
@@ -153,7 +159,11 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
             $scope.formData.firstName = data.firstName;
             $scope.formData.lastName = data.lastName;
             $scope.formData.address = data.address;
+            $scope.formData.city = data.city;
+            $scope.formData.state = data.state;
+            $scope.formData.zip = data.zip;
             $scope.formData.phoneNumber = data.phoneNumber;
+            $scope.formData.altPhoneNumber = data.alternatePhoneNumber;
             $scope.formData.canGetSMS = data.canGetSMS;
             $scope.formData.contactPreference = data.contactPreference;
             
@@ -162,6 +172,8 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
                 
                 $scope.formData.active = vd.activeVolunteer;
                 $scope.formData.specialNeeds = vd.specialNeeds;
+                $scope.formData.foster = vd.foster;
+                $scope.formData.fostering = vd.fostering;
                 
                 if (vd.birthday)
                     $scope.formData.birthday = new Date(vd.birthday);
@@ -171,8 +183,10 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
                     $scope.formData.lastSeen = new Date(vd.lastSeen);
             
                 $scope.formData.hoursWorked = vd.hoursWorked;
+                $scope.formData.noShows = vd.noShows;
                 $scope.formData.notes = vd.notes;
                 $scope.formData.partners = vd.partners;
+                $scope.formData.dependents = vd.dependents;
                 $scope.formData.emergencyContactName = vd.emergencyContactName;
                 $scope.formData.emergencyContactNumber = vd.emergencyContactNumber;
                 $scope.formData.emergencyContactRelationship = vd.emergencyContactRelationship;
