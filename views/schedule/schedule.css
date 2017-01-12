@@ -43,7 +43,7 @@
 
 .monthSlot {
     height : 20px;
-    width : 20px;
+    width : 2%;
 }
 .monthDayFooter {
     height : 24px;
@@ -76,4 +76,13 @@
     border: solid 1px lightgray;
     cursor: pointer;
     margin: 1px;
+}
+
+.noshow {
+    color : red;
+    text-decoration: line-through;
+}
+
+.qFlag {
+    border: double 3px black;
 }

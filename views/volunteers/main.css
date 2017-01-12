@@ -46,12 +46,13 @@
 .disqualified {
     color : red;
 }
+.minor {
+    background-color : lightgray; 
+}
 
 #mainVformTabs {
     background-color :aliceblue;
 }
-
-
 
 .schedWrap {
     margin-left:30%;
@@ -124,4 +125,14 @@
 .filter > input, .filter > select {
     float:none;
     clear : none;
+}
+
+.paginationControls {
+    margin-left : 20px;
+    padding : 4px;
+}
+.paginationControls > div {
+    cursor : pointer;
+    padding-right : 5px;
+    padding-left : 5px;
 }

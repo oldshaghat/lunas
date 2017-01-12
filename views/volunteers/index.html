@@ -84,7 +84,9 @@
         </ul>
         
     </div>
-    
+    <div class="paginationControls" layout="row">
+        <div ng-click="previousPage()">&lt;</div> Page {{currPage}} of {{totalPages}}<div ng-click="nextPage()">&gt;</div>
+    </div>
     <table class="vlist">
         <thead>
             <tr class="vlistHeader">
@@ -99,7 +101,7 @@
             </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="v in volunteers" id="v._id" ng-click="editVolunteer(v)" ng-class="{'rowSelected' : volunteerSelected[v._id], 'disqualified' : hasDisqualifyingData(v)}">
+        <tr ng-repeat="v in volunteers" id="v._id" ng-click="editVolunteer(v)" ng-class="{'rowSelected' : volunteerSelected[v._id], 'disqualified' : hasDisqualifyingData(v), 'minor' : isMinor(v)}">
             <td>{{v.firstName}} {{v.lastName}}</td>
             <td>{{formatPrefContact(v)}}</td>
             <td>{{formatStatus(v)}}</td> 
@@ -173,6 +175,12 @@
                                         <label>Email</label> 
                                         <input type="text" class="form-control input-lg text-center" ng-model="formData.email">
                                     </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <md-tooltip>Set true to prevent this email from being exported to bulk email reports.</md-tooltip>
+                                        <md-checkbox ng-model="formData.doNotEmail" aria-label="No Bulk?">
+                                            No Bulk?
+                                        </md-checkbox>
+                                    </md-input-container>
                                 </div>
                                 <div layout-gt-sm="row">
                                     <md-input-container class="md-block" flex-gt-sm>
@@ -200,25 +208,25 @@
                                 </div>
                                 <div layout-gt-sm="row">
                                     <md-input-container class="md-block" flex-gt-sm>
-                                        <label>Phone Number</label>
+                                        <label>Home Phone Number</label>
                                         <input type="text" class="form-control input-lg text-center" ng-model="formData.phoneNumber">
                                     </md-input-container>
                                     <md-input-container class="md-block" flex-gt-sm>
-                                        <label>Alt. Phone Number</label>
+                                        <label>Cell Phone Number</label>
                                         <input type="text" class="form-control input-lg text-center" ng-model="formData.altPhoneNumber">
                                     </md-input-container>
                                     <md-input-container class="md-block" flex-gt-sm>
-                                        <md-tooltip>Set true if they can receive text messages on the primary phone number.</md-tooltip>
-                                        <md-checkbox ng-model="formData.canGetSMS" aria-label="SMS?">
-                                            SMS?
-                                        </md-checkbox>
+                                        <label>Work Phone Number</label>
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.workPhoneNumber">
                                     </md-input-container>
                                     <md-input-container class="md-block" flex-gt-sm>
                                         <label>Contact Preference?</label>
                                         <md-select class="form-control input-lg text-center" ng-model="formData.contactPreference">
                                             <md-option value="0">Email</md-option>
-                                            <md-option value="1">Phone</md-option>
+                                            <md-option value="1">Home Phone</md-option>
                                             <md-option value="2">SMS</md-option>
+                                            <md-option value="3">Cell Phone</md-option>
+                                            <md-option value="4">Work Phone</md-option>
                                         </md-select> 
                                     </md-input-container>
                                 </div>

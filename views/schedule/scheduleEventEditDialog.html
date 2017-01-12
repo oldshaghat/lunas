@@ -14,6 +14,7 @@
         </md-toolbar>
         <md-dialog-content>
             <div class="md-dialog-content">
+                <div ng-show="formData.noShow"><strong style="color:red">NO SHOW</strong></div>
                 <div layout-gt-sm="row">
                     <input type="hidden" ng-model="formData.id">
                     <md-autocomplete flex required
@@ -56,15 +57,15 @@
         <md-dialog-actions layout="row">
 
             <span flex></span>
-            <md-button ng-show="formData.id" ng-click="noshow()">
+            <md-button ng-show="formData.id" ng-click="noshow(formData)">
                 <md-tooltip>Record a no-show for the volunteer lead</md-tooltip>
                 No Show
             </md-button>
-            <md-button ng-show="formData.id" ng-click="delete()">
+            <md-button ng-show="formData.id" ng-click="delete(formData)">
                 <md-tooltip>Remove just this scheduled spot (call outs, etc)</md-tooltip>
                 Remove
             </md-button>
-            <md-button ng-show="formData.id" ng-click="deleteAll()">
+            <md-button ng-show="formData.id" ng-click="deleteAll(formData)">
                 <md-tooltip>Remove this and all future schedule spots for this volunteer</md-tooltip>
                 Remove All
             </md-button>

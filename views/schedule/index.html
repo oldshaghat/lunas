@@ -24,7 +24,7 @@
     
     <div>
         <md-content>
-            <md-tabs md-dynamic-height md-border-bottom layout-padding>
+            <md-tabs md-dynamic-height md-border-bottom layout-padding md-selected="tabSelect">
                   
                 <md-tab label="Day">
                     <h4 style="text-align:center"><md-button ng-click="previousDay()">&lt;</md-button>{{viewingDate.toDateString()}}<md-button ng-click="nextDay()">&gt;</md-button></h4>
@@ -37,8 +37,8 @@
                         <md-grid-tile class="headerTile smalls"><md-grid-tile-footer>Smalls</md-grid-tile-footer></md-grid-tile>
                         <md-grid-tile ng-repeat="e in dayData" ng-class="e.eventClass">
                             <div flex layout="column">
-                                <div flex class="booking" ng-repeat="b in e.bookings" ng-click="upsertSchedule($event, viewingDate, e, b)">
-                                    <div>{{b.volunteerName}} <span ng-show="b.arrivalTime">: {{b.arrivalTime}}</span></div>
+                                <div flex class="booking" ng-class="{'qFlag' : b.qFlag}" ng-repeat="b in e.bookings" ng-click="upsertSchedule($event, viewingDate, e, b)">
+                                    <div ng-class="{'noshow' : b.noShow}">{{b.volunteerName}} <span ng-show="b.arrivalTime">: {{b.arrivalTime}}</span></div>
                                     <div>{{b.notes}}</div>
                                 </div>
                                 <div flex class="addNewBooking" ng-click="upsertSchedule($event, viewingDate, e)">+</div>
@@ -82,18 +82,18 @@
                     <h4 style="text-align:center"><md-button ng-click="previousMonth()">&lt;</md-button>{{getMonthName()}}<md-button ng-click="nextMonth()">&gt;</md-button></h4>
                     
                     <md-grid-list md-gutter="2px" md-cols="7" md-rows="6" md-row-height="100px">
-                        <md-grid-tile ng-repeat="day in monthData" class="{{day.topClass}}">
+                        <md-grid-tile ng-repeat="day in monthData" class="{{day.topClass}}" flex ng-click="jumpToDay(day.date)">
                             
-                            <div  layout="column">
-                                <div ng-if="day.events.length > 0">
-                                    <div layout="row">
-                                        <div ng-repeat="e in day.events.slice(0, 5)" class="{{e.eventClass}} monthSlot"></div>
+                            <div  layout="column" flex>
+                                <div ng-if="day.events.length > 0" flex>
+                                    <div layout="row" flex>
+                                        <div flex ng-repeat="e in day.events.slice(0, 5)" class="{{e.eventClass}} monthSlot"></div>
                                     </div>
-                                    <div layout="row">
-                                        <div ng-repeat="e in day.events.slice(5, 10)" class="{{e.eventClass}} monthSlot"></div>
+                                    <div layout="row" flex>
+                                        <div flex ng-repeat="e in day.events.slice(5, 10)" class="{{e.eventClass}} monthSlot"></div>
                                     </div>
-                                    <div layout="row">
-                                        <div ng-repeat="e in day.events.slice(10, 15)" class="{{e.eventClass}} monthSlot"></div>
+                                    <div layout="row" flex>
+                                        <div flex ng-repeat="e in day.events.slice(10, 15)" class="{{e.eventClass}} monthSlot"></div>
                                     </div>
                                 </div>
                                 <div class="monthDayFooter">{{day.label}}</div>

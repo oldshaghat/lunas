@@ -41,7 +41,8 @@ var ScheduleSchema = new mongoose.Schema({
     assignment : Number, //0 cats, 1 catsP, 2 dogs, 3 rab, 4 smalls
     teamSize : Number, //how many people in the team (usually 1 but parent child or whatever counts as more)
     arrivalTime : String, //Optional estimated arrival time (esp. useful for tuesdays)
-    notes : String  //optional text to accompany event - like fixed arrival time if a Tuesday
+    notes : String,  //optional text to accompany event - like fixed arrival time if a Tuesday
+    noShow : Boolean    //true if this booking was marked as a no show
 });
 
 

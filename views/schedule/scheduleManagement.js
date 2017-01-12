@@ -11,6 +11,10 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
     
     var unschClass= 'unscheduled';
     
+    function escapeRegExp(str) {
+        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    };
+    
     $scope.today = new Date();
     $scope.viewingDate = $scope.today;
     
@@ -18,6 +22,23 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
     $scope.weekData = [];           
     $scope.dayData = []; 
     $scope.schedule = [];
+    
+    $scope.tabSelect = 0;
+    
+    $scope.jumpToDay = function(date) {
+        if (!date) return;
+        
+        //check if date is in a different month
+        if (date.getMonth() != $scope.viewingDate.getMonth()) {
+            $scope.viewingDate = date;
+            loadScheduleData()
+        } else {
+            $scope.viewingDate = date;
+            selectDayData();  //from month data
+        }
+        
+        $scope.tabSelect = 0;
+    };
     
     //load schedule information for the month around the viewing date
     function loadScheduleData() {
@@ -173,9 +194,10 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
             booking.teamsize = data[i].teamSize;
             booking.notes = data[i].notes;
             booking.arrivalTime = data[i].arrivalTime;
+            booking.noShow = data[i].noShow;
             //which q do we want? 
             var stat = v.volunteerData.status;
-            var qField = qtrains[d.assignment];
+            var qField = qtrains[data[i].assignment];
             booking.qFlag = stat[qField] ? 1 : 0;
             //add a warno if missing orientation, or something else?
             
@@ -228,9 +250,6 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
         data.assignment = slotData.assignment;
         data.timeslot = slotData.timeslot;
         
-        console.log(slotData);
-        console.log(bookingData);
-        
         if (bookingData) {
             data.id = bookingData.id;
             data.volunteerId = bookingData.volunteerId;
@@ -238,7 +257,11 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
             data.notes = bookingData.notes;
             data.teamSize = bookingData.teamsize;
             data.arrivalTime = bookingData.arrivalTime;
+            data.noShow = bookingData.noShow;
+            data.qFlag = bookingData.qFlag;
         }
+        
+        //. .... can I just ... push the booking data in? is this silly?
             
         $mdDialog.show({
             templateUrl: 'schedule/scheduleEventEditDialog.html',
@@ -250,39 +273,79 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
             controller: DialogController,
         })
         .then(function(answer) {
-            //This is invoked when the dialog hides - so our other actions need to drive different responses here, I guess.
-            //we might be wanting to update a record, insert a record, remove one or more records ... 
-            if (answer && answer.selectedVolunteer && answer.selectedVolunteer.id) {
-                var d = {};
-                if (answer.id) {
-                    d._id = answer.id;
-                }
-                d.volunteerId = answer.selectedVolunteer.id;
-                d.year = date.getFullYear();
-                d.month = date.getMonth();
-                d.day = date.getDate();
-                d.timeslot = slotData.timeslot;
-                d.assignment = slotData.assignment;
-                d.teamSize = answer.teamsize;
-                d.arrivalTime = answer.arrivalTime;
-                d.notes = answer.notes;
-                $http.post('/api/schedule', d)
-                    .then(function(r) {
-                        //add it to the local data model / update 
-                        //oh but I need the new id and the post isn't giving it up here .. shit
-                        //so I guess I just ask for everything again. Ugh.
-                        loadScheduleData();
-                    }, function(e) {
-                        console.log(e);
-                    });
-                
-            } 
+            if (answer.action == 'save') {
+                saveData(answer, date, slotData); 
+            } else if (answer.action == 'noshow') {
+                markNoShow(answer, date, slotData);
+            } else if (answer.action == 'delete') {
+                deleteData(answer);
+            } else if (answer.action == 'deleteall') {
+                deleteAllFutureData(answer, date);
+            }
+            
         }, function() {
             //dialog cancelled
         });
-        
+    };
+    
+///////////////////////////   
+//dialog actions :
+    
+    function saveData(answer, date, slotData) {
+        //we might be wanting to update a record, insert a record, remove one or more records ... 
+        if (answer && answer.selectedVolunteer && answer.selectedVolunteer.id) {
+            var d = {};
+            if (answer.id) {
+                d._id = answer.id;
+            }
+            d.volunteerId = answer.selectedVolunteer.id;
+            d.year = date.getFullYear();
+            d.month = date.getMonth();
+            d.day = date.getDate();
+            d.timeslot = slotData.timeslot;
+            d.assignment = slotData.assignment;
+            d.teamSize = answer.teamsize;
+            d.arrivalTime = answer.arrivalTime;
+            d.notes = answer.notes;
+            d.noShow = answer.noShow;
+            $http.post('/api/schedule', d)
+                .then(function(r) {
+                    //add it to the local data model / update 
+                    //oh but I need the new id and the post isn't giving it up here .. shit
+                    //so I guess I just ask for everything again. Ugh.
+                    loadScheduleData();
+                }, function(e) {
+                    console.log(e);
+                });
+                
+        } 
+    };
+    
+    function markNoShow(answer, date, slotData) {
+        if (answer && answer.selectedVolunteer && answer.selectedVolunteer.id) {
+            
+            $http.post('/api/volunteers/' + answer.selectedVolunteer.id + '/noshowsInc');
+            answer.noShow = true;
+            saveData(answer, date, slotData);
+        }
         
     };
+    function deleteData(answer) {
+        if (answer.id) {
+            //escape/clean/validate before posting
+            $http.delete('/api/schedule?id=' + answer.id)
+            .then(function(r) {
+                loadScheduleData();
+            }, function(er) {
+                console.log(er);
+            })
+        }
+    
+    };
+    function deleteAllFutureData(answer, date) {
+        
+    };
+    
     
     
     //The subcontroller for our dialog popup has to manage the form and autocomplete 
@@ -295,20 +358,24 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
           $mdDialog.cancel();
         };
 
-        $scope.answer = function(answer) {
-          $mdDialog.hide(answer);
+        $scope.answer = function(data) {
+            data.action = 'save';
+            $mdDialog.hide(data);
         };
         
-        $scope.noshow = function() {
-            
+        $scope.noshow = function(data) {
+            data.action = 'noshow';
+            $mdDialog.hide(data);            
         };
         
-        $scope.delete = function() {
-            
+        $scope.delete = function(data) {
+            data.action = 'delete';
+            $mdDialog.hide(data);          
         };
         
-        $scope.deleteAll = function() {
-            
+        $scope.deleteAll = function(data) {
+            data.action = 'deleteall';
+            $mdDialog.hide(data);           
         };
         
         $scope.formData = {};
@@ -316,7 +383,6 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
         $scope.formData.selectedVolunteer = {id : "", display : " "}; //see https://github.com/angular/material/issues/3760 - MD Auto wants a 'truthy' value for display
         $scope.title = "Edit Schedule for " + assignments[src.assignment] + " in the " + times[src.timeslot];
         $scope.titleBarClass = classes[src.assignment];
-        console.log(src);
         if (src.id) {
             //then we are updating - prefill the form data
             $scope.formData.id = src.id;
@@ -324,14 +390,17 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
             $scope.formData.teamsize = src.teamSize;
             $scope.formData.notes = src.notes;
             $scope.formData.arrivalTime = src.arrivalTime;
+            $scope.formData.noShow = src.noShow;
             $scope.searchText = src.volunteerName;
         }
 
         //bind the query for the autocomplete
         $scope.querySearch = function(searchString) {
-            console.log("invoking search for volunteers with " + searchString);
             //should we have a narrower api where we can project smaller chunks of data 
-            return $http.get('/api/volunteers?name=' + searchString)
+            //some search strings like "*" really screw this up
+            var s = escapeRegExp(searchString);
+            
+            return $http.get('/api/volunteers?name=' + s)
                 .then(function(data) {
                      var results = data.data;
                      if (results)

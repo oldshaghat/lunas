@@ -10,16 +10,33 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
     $scope.minDate = new Date(1900,1,1);
     $scope.maxDate = new Date(2100,1,1);
     
+    $scope.currPage = 1;
+    $scope.totalPages = 1;
+    
     $scope.states = ('AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS ' +
     'MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI ' +
     'WY').split(' ').map(function(state) {
         return {abbrev: state};
       });
     
+    $scope.previousPage = function() {
+        if ($scope.currPage > 1) {
+            $scope.currPage = $scope.currPage -1;
+            queryTableData();
+        }  
+    };
+    $scope.nextPage = function() {
+        if ($scope.currPage < $scope.totalPages) {
+            $scope.currPage = $scope.currPage + 1;
+            queryTableData();
+        }  
+    };
+    
+    //filter and pagination are query params
     function buildFilterString () {
+        var q = "?page=" + ($scope.currPage - 1);
         if (!$scope.filters || $scope.filters.length == 0)
-            return "";  
-        var q = "?";
+            return q;  
         for (var k = 0; k < $scope.filters.length; k++) {
             var f = $scope.filters[k];
             //todo : urlencode to avoid issues with special characters
@@ -34,7 +51,8 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
         var filterString = buildFilterString();
         $http.get('/api/volunteers' + filterString)
             .then(function(data) {
-                $scope.volunteers = data.data;
+                $scope.totalPages = Math.ceil(data.data.pageCount);
+                $scope.volunteers = data.data.data; //jesus christ.
             }, function(data) {
                 console.log(data);
             });
@@ -164,7 +182,9 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
             $scope.formData.zip = data.zip;
             $scope.formData.phoneNumber = data.phoneNumber;
             $scope.formData.altPhoneNumber = data.alternatePhoneNumber;
-            $scope.formData.canGetSMS = data.canGetSMS;
+            $scope.formData.workPhoneNumber = data.workPhoneNumber;
+            $scope.formData.canGetSMS = data.canGetSMS;  //could elide
+            $scope.formData.doNotEmail = data.doNotEmail;
             $scope.formData.contactPreference = data.contactPreference;
             
             if (data.volunteerData) {
@@ -309,8 +329,19 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
         if (v.contactPreference === 1) 
             return v.phoneNumber;
         
-        if (v.contactPreference === 2)
-            return 'Text Message to ' + v.phoneNumber;
+        if (v.contactPreference === 2) {
+            if (v.alternatePhoneNumber) {
+                return 'Text Message to ' + v.alternatePhoneNumber;
+            }
+            return 'Text Message to ' + v.phoneNumber;  //fallback to home value
+        }
+        
+        if (v.contactPreference === 3) 
+            return v.alternatePhoneNumber;
+        
+        if (v.contactPreference === 4) 
+            return v.workPhoneNumber;
+        
         
         return "N/A";
     };
@@ -406,6 +437,13 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
             }
         }
         return false;
+    };
+    
+    $scope.isMinor = function(v) {
+      if (v && v.volunteerData && v.volunteerData.birthday)  {
+            var ageInMilliseconds = new Date() - new Date(v.volunteerData.birthday);
+            return ageInMilliseconds < 567648000000; // 18 years in milliseconds
+      }
     };
 });
 

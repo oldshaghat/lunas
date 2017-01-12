@@ -193,6 +193,13 @@ app.delete('/api/users',
 //////////////////////////////////////
 //volunteer management - view, search, edit, volunteers stored in the portal
 
+const itemsPerPage = 10;
+//look for page# parameter on the query - if not found assume first page
+function buildPagination(req) {
+    var page = req.query.page || 0;
+    return { skip : page*itemsPerPage, limit : itemsPerPage};
+};
+
 function buildCriteria(req) {
     var criteria = {}; //we're going to AND together a set of clauses 
     var critList = []; 
@@ -202,9 +209,17 @@ function buildCriteria(req) {
     }
     if (req.query.name) {
         //if name term contains a space they might be typing a first name part and a last name part or vice versa (search for smith bob vs bob smith)
-        //look at first or last name
-        var reg = new RegExp(req.query.name, 'i');
-        critList.push({'$or' : [ {'firstName' : reg}, {'lastName' : reg}]});
+        if (req.query.name.indexOf(' ') > 0) {
+            //what if we're looking for some name via three pieces? haha
+            var tokes = req.query.name.split(' ');
+            var fnReg = new RegExp(tokes[0].trim(), 'i');
+            var lnReg = new RegExp(tokes[1].trim(), 'i');
+            critList.push({'$or' : [ {'firstName' : fnReg}, {'lastName' : lnReg}]});
+        } else {
+            //use same regex for both
+            var reg = new RegExp(req.query.name, 'i');
+            critList.push({'$or' : [ {'firstName' : reg}, {'lastName' : reg}]});
+        }
     }
     if (req.query.training) {
         var training = req.query.training;
@@ -247,6 +262,30 @@ function buildCriteria(req) {
     return criteria;
 };
 
+function volunteerTableQuery(req, res) {
+        //examine the query parameters for any other filters or criteria 
+        var criteria = buildCriteria(req);
+        var options = buildPagination(req);
+        //return current list of volunteers
+        //plausibly we want to project here since this query drives a summary table
+        var projection = {
+
+        };
+        //count in this filter set
+        Volunteer.count(criteria, function(err, c) {
+            var pageCount = c / itemsPerPage;
+            Volunteer.find(criteria, projection, options, function(err, vtrs) {
+                if (err) 
+                    res.send(err); 
+                else {
+                    var paginateData = {pageCount : pageCount, data : vtrs};
+                    res.json(paginateData);
+                }
+            });
+        });
+};
+
+
 app.get('/api/volunteers/' , 
         verifyAuth,
         function (req, res) {
@@ -258,20 +297,7 @@ app.get('/api/volunteers/' ,
                         res.json(v);
                 });
             } else {
-                //examine the query parameters for any other filters or criteria 
-                var criteria = buildCriteria(req);
-                
-                //return current list of volunteers
-                //plausibly we want to project here since this query drives a summary table
-                var projection = {
-                    
-                };
-                Volunteer.find(criteria, function(err, vtrs) {
-                    if (err) 
-                        res.send(err); 
-                    else
-                        res.json(vtrs);
-                });
+                volunteerTableQuery(req, res);
             }
 });
 
@@ -309,8 +335,10 @@ app.post('/api/volunteers/' ,
                     zip : req.body.zip,
                     phoneNumber : req.body.phoneNumber,
                     alternatePhoneNumber : req.body.altPhoneNumber,
+                    workPhoneNumber : req.body.workPhoneNumber,
                     canGetSMS : req.body.canGetSMS,
                     contactPreference : prefContact,
+                    doNotEmail : req.body.doNotEmail,
 
                     //TODO should we check to see if we have any data to save first?
                     volunteerData : {
@@ -422,15 +450,21 @@ app.post('/api/volunteers/' ,
                         console.log(err);
                         res.redirect('/vdb'); 
                     } else {
-                        //how does this see the current state of the filters tho
-                        var criteria = buildCriteria(req);
-                        //return current list of volunteers
-                        Volunteer.find(criteria, function(err, vtrs) {
-                            if (err) res.send(err); else
-                            res.json(vtrs);
-                        });
+                        volunteerTableQuery(req, res);
                     }
                 });
+});
+
+//what's the RESTful way to do this I wonder? probably not exactly this.
+app.post('/api/volunteers/:vid/noshowsInc',
+         verifyAuth,
+         function(req, res) {
+            var criteria = {_id : req.params.vid};
+            var updateOp = { '$inc' : { 'volunteerData.noShows' : 1}};
+            Volunteer.findOneAndUpdate(criteria, updateOp, function(err, r) {
+                if (err) console.log(err);
+            });
+    
 });
 
 app.delete('/api/volunteers/' , 
@@ -447,11 +481,7 @@ app.delete('/api/volunteers/' ,
             Volunteer.remove(
                 { _id : req.query.id },
                 function (err, r) {
-                    //return current list of volunteers
-                    Volunteer.find(function(err, vtrs) {
-                        if (err) res.send(err);
-                        res.json(vtrs);
-                    });
+                    volunteerTableQuery(req, res);
                 });
 });
 
@@ -507,7 +537,8 @@ app.post('/api/schedule',
                     assignment : validatedAssignment,           //0 cats, 1 catsP, 2 dogs, 3 rab, 4 smalls
                     teamSize : validatedTeamSize,               //how many people in the team (usually 1 but parent child or whatever counts as more)
                     notes : req.body.notes,                      //optional text to accompany event - like fixed arrival time if a Tuesday
-                    arrivalTime : req.body.arrivalTime
+                    arrivalTime : req.body.arrivalTime,
+                    noShow : req.body.noShow
                 },
                 { upsert : true },
                  

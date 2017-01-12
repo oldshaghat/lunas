@@ -13,11 +13,13 @@ var VolunteerSchema = new mongoose.Schema({
     city : String,
     state : String,
     zip : String,
-    phoneNumber : String,
-    alternatePhoneNumber : String,
-    canGetSMS : Boolean,
-    contactPreference : Number, //0 : Email, 1 : Phone, 2 : TxtMsg (implies canGetSMS?)
-
+    phoneNumber : String,  //home
+    alternatePhoneNumber : String,  //cell
+    workPhoneNumber : String, //work
+    canGetSMS : Boolean, //obsolete ish
+    contactPreference : Number, //0 : Email, 1 : (Home)Phone, 2 : TxtMsg (if alternate phone empty, fallback or fail?), 3 : Call Cell Phone 4: Call Work Phone 
+    doNotEmail : Boolean,  //don't grab this email in an export
+    
     //Does this person volunteer at the shelter?
     volunteerData : {
         activeVolunteer : Boolean,
