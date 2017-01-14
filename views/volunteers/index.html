@@ -400,6 +400,11 @@
                                     </md-tab>
                                     <md-tab label="Availability">
                                         <div layout-gt-sm="row" layout-padding>
+                                            <div class="av-weekend" flex>Sunday
+                                                <div class="av-timeslot" flex>  Morning :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitysundaymorning"></div>
+                                                <div class="av-timeslot" flex>  Afternoon :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitysundayafternoon"></div>
+                                                <div class="av-timeslot" flex>  Evening :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitysundayevening"></div>
+                                            </div>
                                             <div class="av-weekday" flex>Monday
                                                 <div class="av-timeslot" flex>  Morning :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitymondaymorning"></div>
                                                 <div class="av-timeslot" flex>  Afternoon :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitymondayafternoon"></div>
@@ -429,11 +434,6 @@
                                                 <div class="av-timeslot" flex>  Morning :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitysaturdaymorning"></div>
                                                 <div class="av-timeslot" flex>  Afternoon :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitysaturdayafternoon"></div>
                                                 <div class="av-timeslot" flex>  Evening :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitysaturdayevening"></div>
-                                            </div>
-                                            <div class="av-weekend" flex>Sunday
-                                                <div class="av-timeslot" flex>  Morning :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitysundaymorning"></div>
-                                                <div class="av-timeslot" flex>  Afternoon :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitysundayafternoon"></div>
-                                                <div class="av-timeslot" flex>  Evening :<input type="checkbox" class="form-control input-lg text-center" ng-model="formData.availabilitysundayevening"></div>
                                             </div>
                                         </div>
                                         <div layout="row">
@@ -506,9 +506,9 @@
                         </md-tab>
                     </md-tabs>
                 </md-content>
-                <button type="submit" class="btn btn-primary btn-lg" ng-click="upsertVolunteer()">Add/Update</button>
-                <button type="submit" class="btn btn-primary btn-lg" ng-click="clearForm()">Cancel</button>
-                <button type="submit" class="btn btn-primary btn-lg" ng-click="deleteRecord()">Delete</button>
+                <button type="button" class="btn btn-primary btn-lg" ng-click="upsertVolunteer()">Add/Update</button>
+                <button type="button" class="btn btn-primary btn-lg" ng-click="clearForm()">Cancel</button>
+                <button type="button" class="btn btn-primary btn-lg" ng-click="deleteRecord()">Delete</button>
                 
             </form>
         </div>

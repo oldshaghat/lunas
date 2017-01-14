@@ -13,7 +13,7 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
     $scope.currPage = 1;
     $scope.totalPages = 1;
     
-    $scope.states = ('AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS ' +
+    $scope.states = ('MD AK AL AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA MA ME MI MN MS ' +
     'MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI ' +
     'WY').split(' ').map(function(state) {
         return {abbrev: state};
@@ -142,7 +142,8 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
         $http.post('/api/volunteers' + buildFilterString(), $scope.formData)
             .then(function(data) {
                 $scope.formData = {};
-                $scope.volunteers = data.data;
+                $scope.totalPages = Math.ceil(data.data.pageCount);
+                $scope.volunteers = data.data.data; //jesus christ.
             }, function(data) {
                 console.log('Error: ' + data);
         });
@@ -156,8 +157,8 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
         var oid = $scope.formData._id
         $http.delete('/api/volunteers?id=' + oid)
             .then(function(data) {
-                $scope.formData = {};
-                $scope.volunteers = data.data;
+                $scope.totalPages = Math.ceil(data.data.pageCount);
+                $scope.volunteers = data.data.data; //jesus christ.
             }, function(data) {
                 console.log('Error: ' + data);
         })

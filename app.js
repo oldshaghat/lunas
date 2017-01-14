@@ -193,7 +193,7 @@ app.delete('/api/users',
 //////////////////////////////////////
 //volunteer management - view, search, edit, volunteers stored in the portal
 
-const itemsPerPage = 10;
+const itemsPerPage = 20;
 //look for page# parameter on the query - if not found assume first page
 function buildPagination(req) {
     var page = req.query.page || 0;
@@ -274,7 +274,7 @@ function volunteerTableQuery(req, res) {
         //count in this filter set
         Volunteer.count(criteria, function(err, c) {
             var pageCount = c / itemsPerPage;
-            Volunteer.find(criteria, projection, options, function(err, vtrs) {
+            Volunteer.find(criteria, projection, options).sort('lastName').exec(function(err, vtrs) {
                 if (err) 
                     res.send(err); 
                 else {
