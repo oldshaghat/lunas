@@ -1,0 +1,44 @@
+<md-dialog aria-label="Recurrance">
+
+    <form>
+    
+        <md-toolbar>
+            <div class="md-toolbar-tools {{titleBarClass}}">
+                <h2>{{title}}</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" style="color:red;" ng-click="cancel()">
+                    <md-tooltip>Cancel editing this data. You can also just click outside the dialog to cancel.</md-tooltip>
+                  X
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <div layout="row">
+                    Recur : 
+                    <select ng-model="recurForm.period">
+                        <option value="0">Daily</option>
+                        <option value="1">Weekly</option>
+                        <option value="2">Bi-Weekly</option>
+                        <option value="3">Monthly</option>
+                    </select>
+                </div>
+                <div layout="row">
+                    <select ng-model="recurForm.limitType">
+                        <option value="0">Until Date:</option>
+                        <option value="1">Number of times:</option>
+                    </select>
+                    <input type="text" ng-model="recurForm.limitAmount">
+                </div>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+
+            <span flex></span>
+            <md-button ng-click="answer(recurForm)">
+                <md-tooltip>Create these recurring appointments</md-tooltip>
+                Save
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

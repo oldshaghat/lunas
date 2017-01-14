@@ -125,6 +125,12 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
             var f = {summary : 'Active Volunteers Only', kind : 'activeOnly', term : '1'};
             addOrUpdateFilter(f);
         }
+        else if ($scope.filterModel.criteriaType == 6 || $scope.filterModel.criteriaType == 7) {
+            var age = 14;
+            if ($scope.filterModel.criteriaType == 7) age = 18;
+            var f = {summary : 'Older than ' + age, kind : 'age', term : age};
+            addOrUpdateFilter(f);
+        }
         queryTableData();
         
         $scope.filterModel = {};
@@ -415,7 +421,7 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
         if (!vd) return 'unav';
         var a  = vd.availability;
         if (!a) return 'unav';
-        var days = [a.monday, a.tuesday, a.wednesday, a.thursday, a.friday, a.saturday, a.sunday];
+        var days = [ a.sunday, a.monday, a.tuesday, a.wednesday, a.thursday, a.friday, a.saturday];
         if (dayIndex >= 0 && dayIndex <= 6) {
             var d = days[dayIndex];
             if (!d) return 'unav';

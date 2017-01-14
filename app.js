@@ -255,6 +255,13 @@ function buildCriteria(req) {
     if (req.query.activeOnly) {
         critList.push({'volunteerData.activeVolunteer' : true});
     }
+    if (req.query.age) {
+        //back calculate the birthday
+        var age = req.query.age; 
+        var bday = new Date(); 
+        bday.setFullYear(bday.getFullYear() - age);
+        critList.push({'volunteerData.birthday' : {$lte : bday}});
+    }
     //we want all of these supplied criteria to be true
     if (critList.length > 0) {
         criteria['$and'] = critList;
@@ -568,6 +575,37 @@ app.delete('/api/schedule',
                     res.json(r);
                 });
     
+});
+
+//strange misfit toy API route for doing a delete-all-forward call
+app.delete('/api/scheduleBatch',
+          verifyAuth,
+          function(req, res) {
+            if (!req.query.id) {
+                res.redirect('/sch'); 
+            }
+            var volunteerId = req.query.id;
+            var deleteForwardFromDate = new Date(req.query.date);
+            var year = deleteForwardFromDate.getFullYear();
+            var month = deleteForwardFromDate.getMonth();
+            var day = deleteForwardFromDate.getDate();
+            //we want to delete things that happen after this time but we can't do multiplicative criteria
+            //so that's everything in the next year; or everything that is this year and next month, or everything that is this year and month and the next day
+            var clauses = [];
+            clauses.push({'year' : {'$gt' : year}}); //delete everything in following years
+            clauses.push({'$and' : [{'year' : year, 'month' : {'$gt' : month}}]}); //delete everything this year that happens at a later month
+            clauses.push({'$and' : [{'year' : year, 'month' : month, 'dayOfMonth' : {'$gte' : day}}]}); //delete everything this month that happens today or later.
+            Schedule.remove(
+                { 
+                    'volunteerId' : volunteerId,
+                    '$or' : clauses
+                },
+                function (err, r) {
+                     if (err) {
+                        console.log(err);
+                     }
+                    res.json(r);
+                });
 });
 
 

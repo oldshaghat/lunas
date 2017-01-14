@@ -249,6 +249,7 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
         var data = {};
         data.assignment = slotData.assignment;
         data.timeslot = slotData.timeslot;
+        data.date = date;
         
         if (bookingData) {
             data.id = bookingData.id;
@@ -338,12 +339,20 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
                 loadScheduleData();
             }, function(er) {
                 console.log(er);
-            })
+            });
         }
     
     };
     function deleteAllFutureData(answer, date) {
-        
+        //so .... yeah .. unclear API ftw.
+        if (answer.selectedVolunteer && answer.selectedVolunteer.id) {
+            $http.delete('/api/scheduleBatch?id=' + answer.selectedVolunteer.id + "&date=" + date)
+            .then(function(r) {
+                loadScheduleData();
+            }, function(er) {
+                console.log(er);
+            });
+        }
     };
     
     
@@ -378,6 +387,23 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
             $mdDialog.hide(data);           
         };
         
+        $scope.recur = function(data) {
+            if (data.selectedVolunteer && data.selectedVolunteer.id) {
+                data.assignment = src.assignment;
+                data.timeslot = src.timeslot;
+                data.date = src.date;
+                //inception
+                 $mdDialog.show({
+                    templateUrl: 'schedule/recurranceEditDialog.html',
+                    parent: angular.element(document.body),
+                    clickOutsideToClose:true,
+                    fullscreen: false,
+                    locals : {src : data},
+                    controller: RecurranceController,
+                });
+            }
+        }
+        
         $scope.formData = {};
         $scope.searchText = "";
         $scope.formData.selectedVolunteer = {id : "", display : " "}; //see https://github.com/angular/material/issues/3760 - MD Auto wants a 'truthy' value for display
@@ -402,7 +428,7 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
             
             return $http.get('/api/volunteers?name=' + s)
                 .then(function(data) {
-                     var results = data.data;
+                     var results = data.data.data;
                      if (results)
                          return results.map(function(v) { return { id : v._id, display : v.firstName + " " + v.lastName}});
                      return [];
@@ -411,6 +437,108 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
                  });
         };
     };
+    
+    
+    /*
+    Handle the creation of recurring schedule appts.
+    */
+    function RecurranceController($scope, $mdDialog, $http, src) {
+        //if this is a new event we have (possibly) notes, arrivalTime, selectedVolunteer, teamsize fields in src
+        //if this is an existing event that we are adding recurrance to, we have an id, and a noShow.
+        $scope.title = "Create Recurring Appointments for " + src.selectedVolunteer.display;
+        $scope.titleBarClass = classes[src.assignment];
+        
+        $scope.cancel = function() {
+          $mdDialog.cancel();
+        };
+        
+        $scope.answer = function(data) {
+            //recur. always is making new events 
+            //do we want to post N times or have the api accept arrays of data? 
+            var d = {};
+            d.volunteerId = src.selectedVolunteer.id;
+            d.timeslot = src.timeslot;
+            d.assignment = src.assignment;
+            d.teamSize = src.teamsize;
+            d.arrivalTime = src.arrivalTime;
+            d.notes = src.notes;
+            d.noShow = false;
+            var skipInit = false;
+            if (src.id) skipInit = true;
+            var dateArray = produceRecurranceDates(src.date, data.period, data.limitType, data.limitAmount, skipInit);
+            
+            dateArray.map(function(rDate) {
+                    d.year = rDate.getFullYear();
+                    d.month = rDate.getMonth();
+                    d.day = rDate.getDate();
+                    var snapshot = Object.assign({}, d); //simple shallow cloning - might not be needed in the map?
+                    return $http.post('/api/schedule', snapshot); //return the promise to the map
+                }).reduce(function(p, c) { return p.then(c); }, Promise.resolve())
+            .then(function(result) {
+                loadScheduleData();
+            });
+            
+            $mdDialog.hide(data);
+        };
+    };
+    
+    function produceRecurranceDates(date, period, limitType, limitAmount, skipInitial) {
+        var offset; 
+        if (period == 0) //daily
+            {
+                offset = function(d) { var x = new Date(d); x.setDate(d.getDate() + 1); return x; };
+            }
+        if (period == 1) //weekly
+            {
+                offset = function(d) { var x = new Date(d); x.setDate(d.getDate() + 7); return x; };
+            }
+        if (period == 2) //bi weekly
+            {
+                offset = function(d) { var x = new Date(d); x.setDate(d.getDate() + 14); return x; };
+            } 
+        if (period == 3) //monthly
+            {
+                //we want to repeat on the same relative timing of the month
+                //ie, 3rd tuesday, 1st monday, etc. 
+                offset = function(d) { 
+                    var weekOrd = Math.ceil(d.getDate()/7); //the Nth week of the month
+                    var dayOfMonth = d.getDay();
+                    var x = new Date(d); 
+                    //make it next month
+                    x.setMonth(d.getMonth() + 1); 
+                    x.setDate(1);
+                    var startDay = x.getDay(); //this month starts on a ... 
+                    //set the date 
+                    var date = 1 + 7*(weekOrd - 1) + dayOfMonth - startDay;
+                    x.setDate(date);
+                    return x; 
+                };
+            }
+        
+        var done = function(date, count) { return true; }
+        if (limitType == 0) {
+            var end = new Date(limitAmount);
+            done = function(date, count) {return (date >= end); };
+        }
+        if (limitType == 1) {
+            done = function(date, count) {return count >= limitAmount; };
+        }
+        
+        var i = 0;
+        var d = date;
+        var out = [];
+        if (!skipInitial) {
+            out.push(d);
+            i++;
+        }
+        while (!done(d, i)) {
+            d = offset(d);
+            out.push(d);
+            i++;
+        }
+        return out;
+    };
+    
     
     $scope.getMonthName = function() {
         var i = $scope.viewingDate.getMonth();

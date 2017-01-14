@@ -69,7 +69,12 @@
                 <md-tooltip>Remove this and all future schedule spots for this volunteer</md-tooltip>
                 Remove All
             </md-button>
+            <md-button ng-click="recur(formData)">
+                <md-tooltip>Save multiple copies of this data at some interval</md-tooltip>
+                Recur
+            </md-button>
             <md-button ng-click="answer(formData)">
+                <md-tooltip>Save just this entry in the schedule</md-tooltip>
                 Save
             </md-button>
         </md-dialog-actions>
