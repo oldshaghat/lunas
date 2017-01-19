@@ -346,6 +346,7 @@ app.post('/api/volunteers/' ,
                     canGetSMS : req.body.canGetSMS,
                     contactPreference : prefContact,
                     doNotEmail : req.body.doNotEmail,
+                    contactNotes : req.body.contactNotes,
 
                     //TODO should we check to see if we have any data to save first?
                     volunteerData : {
@@ -630,6 +631,87 @@ app.post('/api/vsj',
     
 });
 
+//////////////////
+//// Report API
+
+app.get('/api/report/email',
+       verifyAuth,
+       function(req, res) {
+            var excludeMinors = req.query.excludeMinors;
+            var respectOptOut = req.query.respectOptOut;
+            var skipInactive = req.query.skipInactive;
+            var skipDisqualified = req.query.skipDisqualified;
+    
+            var minorsBornAfter = new Date();
+            minorsBornAfter.setFullYear(minorsBornAfter.getFullYear() - 18);
+    
+            var deDuplicate = req.query.deDuplicate;
+    
+            var projection = {'email' : 1};
+            var criteria = {
+                'email' : {'$ne' : null},
+            };
+    
+            if (excludeMinors != 'false') {
+                criteria['volunteerData.birthday'] = {'$lte' : minorsBornAfter};
+            }
+            if (respectOptOut != 'false') {
+                criteria['doNotEmail'] = {'$in' : [null, false]};
+            }
+            if (skipInactive != 'false') {
+                criteria['volunteerData.activeVolunteer'] = true;
+            }
+            if (skipDisqualified != 'false') {
+                criteria['disqualifyingData.surrenderedAnimal'] =  null;
+                criteria['disqualifyingData.failedVetCheck'] =  null;
+                criteria['disqualifyingData.failedHomeInspection'] =  null;
+                criteria['disqualifyingData.notes'] =  null;
+            }
+            Volunteer.find(criteria, projection, function (err, results) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    //manual distinct since mongoose doesn't like to do projection + distincting
+                    if (deDuplicate != 'false') {
+                        results = Array.from(new Set(results.map(
+                              function (s) {
+                                  return s.email;
+                              }
+                          )));
+                    } else {
+                        results = results.map(function(s) {return s.email;});
+                    }
+                    res.json(results);
+                });
+});
+
+
+app.get('/api/report/emergencyContact',
+       verifyAuth,
+       function(req, res) {
+            var skipInactive = req.query.skipInactive;
+            var projection = {
+                'email' : 1, 
+                'firstName' : 1, 
+                'lastName' : 1, 
+                'volunteerData.emergencyContactName' : 1,
+                'volunteerData.emergencyContactNumber' : 1
+            };
+            var criteria = {
+                '$or' : [{'volunteerData.emergencyContactName' : null}, {'volunteerData.emergencyContactNumber' : null}]
+            };
+    
+            if (skipInactive != 'false') {
+                criteria['volunteerData.activeVolunteer'] = true;
+            }
+    
+            Volunteer.find(criteria, projection, function (err, results) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    res.json(results);
+                });
+});
 
 //////////////////////////////////////////
 ////// Views / pages
@@ -650,6 +732,12 @@ app.get('/sch',
        verifyAuth,
        function(req, res) {
             res.sendFile(__dirname + '/views/schedule/index.html') 
+});
+
+app.get('/rpt',
+       verifyAuth,
+       function(req, res) {
+            res.sendFile(__dirname + '/views/report/index.html') 
 });
 
 //TODO these should be over https not http

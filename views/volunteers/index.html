@@ -14,14 +14,7 @@
 
 <body ng-controller="VolunteerManagementController">
     
-    <div class="nav">
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/vdb">Volunteers</a></li>
-            <li><a href="/vu">Users</a></li>
-            <li><a href="/sch">Schedule</a></li>
-        </ul>
-    </div>
+    <div ng-include="'../nav/nav.html'"></div>
     
     <div class="filter">
         <select class="input-lg" ng-model="filterModel.criteriaType">
@@ -103,7 +96,7 @@
             </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="v in volunteers" id="v._id" ng-click="editVolunteer(v)" ng-class="{'rowSelected' : volunteerSelected[v._id], 'disqualified' : hasDisqualifyingData(v), 'minor' : isMinor(v)}">
+        <tr ng-repeat="v in volunteers" id="v._id" ng-click="editVolunteer(v)" ng-class="{'disqualified' : hasDisqualifyingData(v), 'minor' : isMinor(v), 'rowSelected' : volunteerSelected[v._id]}">
             <td>{{v.firstName}} {{v.lastName}}</td>
             <td>{{formatPrefContact(v)}}</td>
             <td>{{formatStatus(v)}}</td> 
@@ -230,6 +223,12 @@
                                             <md-option value="3">Cell Phone</md-option>
                                             <md-option value="4">Work Phone</md-option>
                                         </md-select> 
+                                    </md-input-container>
+                                </div>
+                                <div layout-gt-sm="row">
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Notes</label>
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.contactNotes">
                                     </md-input-container>
                                 </div>
                             </md-content>
@@ -509,6 +508,7 @@
                     </md-tabs>
                 </md-content>
                 <button type="button" class="btn btn-primary btn-lg" ng-click="upsertVolunteer()">Add/Update</button>
+                <button type="button" class="btn btn-primary btn-lg" ng-click="duplicateVolunteer()">Duplicate</button>
                 <button type="button" class="btn btn-primary btn-lg" ng-click="clearForm()">Cancel</button>
                 <button type="button" class="btn btn-primary btn-lg" ng-click="deleteRecord()">Delete</button>
                 

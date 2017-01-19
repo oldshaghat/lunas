@@ -1,0 +1,96 @@
+<!doctype html>
+<html ng-app="reporting">
+
+<head>
+    <link href="bower/angular-material/angular-material.css" rel="stylesheet">
+    <link href="../report/report.css" rel="stylesheet">
+    
+    <script src="bower/angular/angular.js"></script>
+    <script src="bower/angular-animate/angular-animate.js"></script>
+    <script src="bower/angular-aria/angular-aria.js"></script>
+    <script src="bower/angular-material/angular-material.js"></script>
+    <script src="../report/report.js"></script>
+</head>
+
+<body ng-controller="ReportController">
+    
+    <div ng-include="'../nav/nav.html'"></div>
+    
+    <md-tabs md-dynamic-height md-border-bottom layout-padding>
+        <md-tab label="Email Report">
+            <form>
+                <md-input-container class="md-block" flex-gt-sm>
+                    <md-tooltip>Should email addresses belonging to minors (under 18) be included?</md-tooltip>
+                    <md-checkbox ng-model="emailOptions.excludeMinors" aria-label="Exclude Minors?">
+                        Exclude Minors?
+                    </md-checkbox>
+                </md-input-container>
+                <md-input-container class="md-block" flex-gt-sm>
+                    <md-tooltip>If a volunteer requests "no bulk email" they will not be included </md-tooltip>
+                    <md-checkbox ng-model="emailOptions.respectOptOut" aria-label="Use Opt Out?">
+                        Respect Opt Out Flag?
+                    </md-checkbox>
+                </md-input-container>
+                <md-input-container class="md-block" flex-gt-sm>
+                    <md-tooltip>Ensure all emails are unique?</md-tooltip>
+                    <md-checkbox ng-model="emailOptions.deDuplicate" aria-label="Exclude Duplicates?">
+                        Exclude Duplicates?
+                    </md-checkbox>
+                </md-input-container>
+                <md-input-container class="md-block" flex-gt-sm>
+                    <md-tooltip>Should email addresses belonging to inactive volunteers be included?</md-tooltip>
+                    <md-checkbox ng-model="emailOptions.skipInactive" aria-label="Active Only?">
+                        Exclude Inactive Volunteers?
+                    </md-checkbox>
+                </md-input-container>
+                <md-input-container class="md-block" flex-gt-sm>
+                    <md-tooltip>Should email addresses belonging to disqualified volunteers be included?</md-tooltip>
+                    <md-checkbox ng-model="emailOptions.skipDisqualified" aria-label="Exclude Disqualified?">
+                        Exclude Disqualified Volunteers?
+                    </md-checkbox>
+                </md-input-container>
+                <button type="submit" ng-click="runEmailReport()">Run</button>
+            </form>
+            
+            <div class="results">
+                <div ng-repeat="e in emailReport">{{e}}</div>
+            </div>
+        </md-tab>
+        <md-tab label="Missing Emergency Contacts">
+            <form>
+                <md-input-container class="md-block" flex-gt-sm>
+                    <md-tooltip>Should inactive volunteers be included?</md-tooltip>
+                    <md-checkbox ng-model="emergOptions.skipInactive" aria-label="Active Only?">
+                        Exclude Inactive Volunteers?
+                    </md-checkbox>
+                </md-input-container>
+                <button type="submit" ng-click="runEmergContactReport()">Run</button>
+            </form>
+            
+            <div class="results">
+                <table class="vlist">
+                    <thead>
+                        <tr class="vlistHeader">
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>EC Name?</th>
+                            <th>EC Number?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="e in emergContactReport">
+                            <td>{{e.firstName}} {{e.lastName}}</td>
+                            <td>{{e.email}}</td>
+                            <td>{{e.volunteerData.emergencyContactName}}</td>
+                            <td>{{e.volunteerData.emergencyContactNumber}}</td>
+                        </tr>  
+                    </tbody>
+                </table>
+            </div>
+        </md-tab>
+        
+    </md-tabs>
+
+    
+</body>
+</html>

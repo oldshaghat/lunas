@@ -155,19 +155,26 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
         });
     };
     
+    $scope.duplicateVolunteer = function() {
+        $scope.formData._id = null;
+        $scope.upsertVolunteer();
+    };
+    
     $scope.deleteRecord = function() {
         //TODO ask are you sure
-        //TODO should this respect filters or clear them
-        $scope.volunteerSelected = [];
-        $scope.filters = [];
-        var oid = $scope.formData._id
-        $http.delete('/api/volunteers?id=' + oid)
-            .then(function(data) {
-                $scope.totalPages = Math.ceil(data.data.pageCount);
-                $scope.volunteers = data.data.data; //jesus christ.
-            }, function(data) {
-                console.log('Error: ' + data);
-        })
+        if (confirm("Are you sure you want to delete this volunteer?")) {
+            //TODO should this respect filters or clear them
+            $scope.volunteerSelected = [];
+            $scope.filters = [];
+            var oid = $scope.formData._id
+            $http.delete('/api/volunteers?id=' + oid)
+                .then(function(data) {
+                    $scope.totalPages = Math.ceil(data.data.pageCount);
+                    $scope.volunteers = data.data.data; //jesus christ.
+                }, function(data) {
+                    console.log('Error: ' + data);
+            })
+        }
     };
     
     //really "obtain volunteer for editing"
@@ -193,6 +200,7 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
             $scope.formData.canGetSMS = data.canGetSMS;  //could elide
             $scope.formData.doNotEmail = data.doNotEmail;
             $scope.formData.contactPreference = data.contactPreference;
+            $scope.formData.contactNotes = data.contactNotes;
             
             if (data.volunteerData) {
                 var vd = data.volunteerData;

@@ -1,0 +1,21 @@
+.vlist > tbody > tr > td {
+    border : solid black 1px;
+    padding : 5px;
+}
+.vlistHeader > th {
+    border : solid black 1px;
+}
+.vlistHeader {
+    background-color: azure;
+    border : solid black 2px;
+    padding : 4px;
+}
+
+.vlist {
+    border-collapse: collapse;
+    margin-left : 25px;
+    margin-top : 20px;
+    margin-bottom : 10px;
+    width : 90%;
+    border : solid black 1px;
+}
