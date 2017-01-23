@@ -124,6 +124,7 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
         sched.rowHeight = "1:1";
         sched.topClass = "";
         sched.date = new Date(date);
+        sched.isToday = sched.date.getFullYear() == $scope.today.getFullYear() && sched.date.getMonth() == $scope.today.getMonth() && sched.date.getDate() == $scope.today.getDate();
         sched.label = date.getDate();
         sched.events = [];
         for (var t = 0; t < 3; t++) {
@@ -142,8 +143,56 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
                 sched.events.push(e);
             }
         }
+        applyClassBusinessRules(sched.events);
         
         $scope.monthData.push(sched);
+    };
+    
+    
+    //We want to have the events show full coverage across timeslots on a given day based on some rules that differ from assignment type to assignment type
+    function applyClassBusinessRules(eventArray) {
+        //cats == 0
+        if (morningAndEveningCovered(0, eventArray)) {
+            fillCoverage(0, eventArray);
+        }
+        //petsmart cats == 1
+        if (morningAndEveningCovered(1, eventArray)) {
+            fillCoverage(1, eventArray);
+        }        
+        
+        //rabbits == 3
+        if (anySlotCovered(3, eventArray)) {
+            fillCoverage(3, eventArray);
+        }        
+        //smalls == 4
+        if (anySlotCovered(4, eventArray)) {
+            fillCoverage(4, eventArray);
+        }
+    };
+    
+    function morningAndEveningCovered(assignment, eventData) {
+        if (eventData[assignment].bookings && eventData[assignment].bookings.length > 0) {
+            if (eventData[assignment + 10].bookings && eventData[assignment + 10].bookings.length > 0) {
+                return true;
+            }
+        }
+        return false;
+    };
+    
+    function anySlotCovered(assignment, eventData) {
+        for (var t = 0; t < 3; t++) {
+            if (eventData[assignment + t*5].bookings && eventData[assignment + t*5].bookings.length > 0) {
+                return true;
+            }
+        }
+        return false;
+    };
+    
+    function fillCoverage(assignment, eventData) {
+        var covClass = classes[assignment];
+        for (var t = 0; t < 3; t++) {
+            eventData[assignment + 5*t].eventClass = covClass;
+        }
     };
     
     function searchData(date, timeslot, assignment) {
@@ -277,7 +326,7 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
             if (answer.action == 'save') {
                 saveData(answer, date, slotData); 
             } else if (answer.action == 'noshow') {
-                markNoShow(answer, date, slotData);
+                toggleNoShow(answer, date, slotData);
             } else if (answer.action == 'delete') {
                 deleteData(answer);
             } else if (answer.action == 'deleteall') {
@@ -322,11 +371,15 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
         } 
     };
     
-    function markNoShow(answer, date, slotData) {
+    function toggleNoShow(answer, date, slotData) {
         if (answer && answer.selectedVolunteer && answer.selectedVolunteer.id) {
-            
-            $http.post('/api/volunteers/' + answer.selectedVolunteer.id + '/noshowsInc');
-            answer.noShow = true;
+            if (answer.noShow) {
+                $http.post('/api/volunteers/' + answer.selectedVolunteer.id + '/noshows/dec');
+                answer.noShow = false;
+            } else {
+                $http.post('/api/volunteers/' + answer.selectedVolunteer.id + '/noshows/inc');
+                answer.noShow = true;
+            }
             saveData(answer, date, slotData);
         }
         

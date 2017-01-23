@@ -464,11 +464,25 @@ app.post('/api/volunteers/' ,
 });
 
 //what's the RESTful way to do this I wonder? probably not exactly this.
-app.post('/api/volunteers/:vid/noshowsInc',
+//I suppose it's an edit of a particular property but I don't want to get and then set it 
+//but I might want to decrement it too 
+//maybe api/vol/:vid/noshows/inc or /dec ? in terms of idempotentcy I guess I really would want to read it, update it outside the api, and submit back the 
+//new correct value
+app.post('/api/volunteers/:vid/noshows/inc',
          verifyAuth,
          function(req, res) {
             var criteria = {_id : req.params.vid};
             var updateOp = { '$inc' : { 'volunteerData.noShows' : 1}};
+            Volunteer.findOneAndUpdate(criteria, updateOp, function(err, r) {
+                if (err) console.log(err);
+            });
+    
+});
+app.post('/api/volunteers/:vid/noshows/dec',
+         verifyAuth,
+         function(req, res) {
+            var criteria = {_id : req.params.vid};
+            var updateOp = { '$inc' : { 'volunteerData.noShows' : -1}};
             Volunteer.findOneAndUpdate(criteria, updateOp, function(err, r) {
                 if (err) console.log(err);
             });

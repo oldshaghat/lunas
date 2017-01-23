@@ -19,25 +19,29 @@
         <md-content>
             <md-tabs md-dynamic-height md-border-bottom layout-padding md-selected="tabSelect">
                   
-                <md-tab label="Day">
+                <md-tab label="Day" flex>
                     <h4 style="text-align:center"><md-button ng-click="previousDay()">&lt;</md-button>{{viewingDate.toDateString()}}<md-button ng-click="nextDay()">&gt;</md-button></h4>
                     
-                    <md-grid-list md-gutter="2px" md-cols="5" md-rows="4" md-row-height="120px">
-                        <md-grid-tile class="headerTile cats"><md-grid-tile-footer>Cats</md-grid-tile-footer></md-grid-tile>
-                        <md-grid-tile class="headerTile catsP"><md-grid-tile-footer>Cats - Petsmart</md-grid-tile-footer></md-grid-tile>
-                        <md-grid-tile class="headerTile dogs"><md-grid-tile-footer>Dogs</md-grid-tile-footer></md-grid-tile>
-                        <md-grid-tile class="headerTile rabbits"><md-grid-tile-footer>Rabbits</md-grid-tile-footer></md-grid-tile>
-                        <md-grid-tile class="headerTile smalls"><md-grid-tile-footer>Smalls</md-grid-tile-footer></md-grid-tile>
-                        <md-grid-tile ng-repeat="e in dayData" ng-class="e.eventClass">
-                            <div flex layout="column">
-                                <div flex class="booking" ng-class="{'qFlag' : b.qFlag}" ng-repeat="b in e.bookings" ng-click="upsertSchedule($event, viewingDate, e, b)">
-                                    <div ng-class="{'noshow' : b.noShow}">{{b.volunteerName}} <span ng-show="b.arrivalTime">: {{b.arrivalTime}}</span></div>
-                                    <div>{{b.notes}}</div>
+                    <div class="dayScheduleWrapper">
+                        <div class="headerRow" layout="row">
+                            <div class="headerTile cats">Cats</div>
+                            <div class="headerTile catsP">Cats - Petsmart</div>
+                            <div class="headerTile dogs">Dogs</div>
+                            <div class="headerTile rabbits">Rabbits</div>
+                            <div class="headerTile smalls">Smalls</div>
+                        </div>
+                        <div layout="row" ng-repeat="i in [0,1,2]">
+                            <div ng-repeat="e in dayData.slice(5*i,5*(i+1))" ng-class="e.eventClass" class="dayScheduleColumn">
+                                <div flex layout="column">
+                                    <div flex class="booking" ng-class="{'qFlag' : b.qFlag}" ng-repeat="b in e.bookings" ng-click="upsertSchedule($event, viewingDate, e, b)">
+                                        <div ng-class="{'noshow' : b.noShow}">{{b.volunteerName}} <span ng-show="b.arrivalTime">: {{b.arrivalTime}}</span></div>
+                                        <div>{{b.notes}}</div>
+                                    </div>
+                                    <div flex class="addNewBooking" ng-click="upsertSchedule($event, viewingDate, e)">+</div>
                                 </div>
-                                <div flex class="addNewBooking" ng-click="upsertSchedule($event, viewingDate, e)">+</div>
                             </div>
-                        </md-grid-tile>
-                    </md-grid-list>
+                        </div>
+                    </div>
                     
 
                     
@@ -74,8 +78,17 @@
                 <md-tab label="Month">
                     <h4 style="text-align:center"><md-button ng-click="previousMonth()">&lt;</md-button>{{getMonthName()}}<md-button ng-click="nextMonth()">&gt;</md-button></h4>
                     
+                    <div layout="row">
+                        <div class="monthDayHeader">Sunday</div>
+                        <div class="monthDayHeader">Monday</div>
+                        <div class="monthDayHeader">Tuesday</div>
+                        <div class="monthDayHeader">Wednesday</div>
+                        <div class="monthDayHeader">Thursday</div>
+                        <div class="monthDayHeader">Friday</div>
+                        <div class="monthDayHeader">Saturday</div>
+                    </div>
                     <md-grid-list md-gutter="2px" md-cols="7" md-rows="6" md-row-height="100px">
-                        <md-grid-tile ng-repeat="day in monthData" class="{{day.topClass}}" flex ng-click="jumpToDay(day.date)">
+                        <md-grid-tile ng-repeat="day in monthData" class="{{day.topClass}}" flex ng-click="jumpToDay(day.date)" ng-class="{'todaysDate' : day.isToday}">
                             
                             <div  layout="column" flex>
                                 <div ng-if="day.events.length > 0" flex>
