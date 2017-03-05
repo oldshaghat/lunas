@@ -18,6 +18,7 @@ const http         = require('http'),
       //load schemas
       userschema   = require('./schema/user'),
       voluschema   = require('./schema/volunteer'),
+      animalschema   = require('./schema/animal'),
       schSchema    = require('./schema/schedule');
 
     
@@ -32,9 +33,11 @@ if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
     process.env.OPENSHIFT_APP_NAME;
 }
 
+//Data Access Obj.
 var User;
 var Volunteer;
 var Schedule;
+var Animal;
 
 //TODO : create a new gmail account for volunteering . sources suggest that we can dispatch 99 emails a day this way.
 // we may have to do some configurating on the account to make this happen. 
@@ -59,6 +62,7 @@ db.once('open', function() {
     
     Volunteer = mongoose.model('Volunteer', voluschema.VolunteerSchema);
     Schedule = mongoose.model('Schedule', schSchema.ScheduleSchema);
+    Animal = mongoose.model('Animal', animalschema.AnimalSchema);
 });
 
 var app = express();
@@ -191,7 +195,7 @@ app.delete('/api/users',
 
 
 //////////////////////////////////////
-//volunteer management - view, search, edit, volunteers stored in the portal
+//volunteer management - view, search, edit, volunteers stored in the portal 
 
 const itemsPerPage = 20;
 //look for page# parameter on the query - if not found assume first page
@@ -430,11 +434,11 @@ app.post('/api/volunteers/' ,
                     },
 
                     donorData : {
-
+                        gifts : req.body.donorDataGifts
                     },
 
                     adopteeData : {
-
+                        adoptions : req.body.adopteeDataAdoptions
                     },
                     
                     boardingData : {
@@ -507,6 +511,29 @@ app.delete('/api/volunteers/' ,
                 });
 });
 
+//////////////////
+/// Animals API
+
+app.get('/api/animals/',
+       verifyAuth,
+       function(req, res) {
+        
+        
+});
+
+app.post('/api/animals/',
+       verifyAuth,
+       function(req, res) {
+        
+        
+});
+
+app.delete('/api/animals/',
+       verifyAuth,
+       function(req, res) {
+        
+        
+});
 
 ///////////////////////////
 ///// Schedule API
@@ -740,6 +767,12 @@ app.get('/vdb',
        verifyAuth,
        function (req, res) {
             res.sendFile(__dirname + '/views/volunteers/index.html');
+});
+
+app.get('/adb',
+       verifyAuth,
+       function (req, res) {
+            res.sendFile(__dirname + '/views/animals/index.html');
 });
 
 app.get('/sch',

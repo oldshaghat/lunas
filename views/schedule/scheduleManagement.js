@@ -200,7 +200,7 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
         for (var i = 0; i < $scope.schedule.length; i++) {
             var e = $scope.schedule[i];
             //check year and month is prob not needed?
-            if (e.dayOfMonth == date.getDate() && e.timeslot == timeslot && e.assignment == assignment) 
+            if ((e.dayOfMonth === date.getDate()) && (e.timeslot === timeslot) && (e.assignment === assignment)) 
                 matches.push(e);
         }
         return matches;
@@ -275,12 +275,12 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
     notes : String  //optional text to accompany event - like fixed arrival time if a Tuesday
     */
 
-    function getDayData(date) {
-        if (!date) return null;
-        var dayOfMonth = date.getDate();
+    function getDayData(requestDate) {
+        if (!requestDate) return null;
         for (var i = 0; i < $scope.monthData.length; i++){
             var d = $scope.monthData[i];
-            if (d.date.getMonth() === date.getMonth() && d.date.getDate() === date.getDate()){
+            if ((d.date.getMonth() === requestDate.getMonth()) && (d.date.getDate() === requestDate.getDate())){
+                console.log(d);
                 return d;
             }
         } 
@@ -638,7 +638,10 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
     $scope.previousDay = function() {
         var m = $scope.viewingDate.getMonth();
         var d = $scope.viewingDate.getDate() - 1;
-        $scope.viewingDate.setDate(d);
+        var temp = new Date($scope.viewingDate);
+        temp.setDate(d);
+        $scope.viewingDate = temp;
+       // $scope.viewingDate.setDate(d);
         if ($scope.viewingDate.getMonth() == m)
             selectDayData();  //from month data
         else
@@ -646,9 +649,14 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
     };
     
     $scope.nextDay = function() {
+
         var m = $scope.viewingDate.getMonth();
         var d = $scope.viewingDate.getDate() +1;
-        $scope.viewingDate.setDate(d);
+        var temp = new Date($scope.viewingDate);
+        temp.setDate(d);
+        $scope.viewingDate = temp;
+       // $scope.viewingDate.setDate(d);
+
         if ($scope.viewingDate.getMonth() == m)
             selectDayData();  //from month data
         else

@@ -6,7 +6,7 @@ var volunteerManagement = angular.module('volunteerManagement', ['ngMaterial'])
 
 volunteerManagement.controller('VolunteerManagementController', function VolunteerManagementController($scope, $http) {
     $scope.volunteerSelected = [];
-    
+    $scope.formData = {};
     $scope.minDate = new Date(1900,1,1);
     $scope.maxDate = new Date(2100,1,1);
     
@@ -161,7 +161,6 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
     };
     
     $scope.deleteRecord = function() {
-        //TODO ask are you sure
         if (confirm("Are you sure you want to delete this volunteer?")) {
             //TODO should this respect filters or clear them
             $scope.volunteerSelected = [];
@@ -308,11 +307,12 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
             
             if (data.donorData) {
                 //array of :: gifts : [{dateOfGift : Date, amountOfGift : Number}]
-                
+                $scope.formData.donorDataGifts = data.donorData.gifts;
             }
             
             if (data.adopteeData) {
                 //array of ::  adoptions : [{animalName : String, animalKind : String, adoptionDate : Date}]
+                $scope.formData.adopteeDataAdoptions = data.adopteeData.adoptions;
             } 
             
             if (data.boardingData) {
@@ -335,6 +335,46 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
             console.log(data);
         });
     
+    };
+    
+    $scope.appendNewDonation = function() {
+        if ($scope.newDonationData) {
+            var amt = Number.parseFloat($scope.newDonationData.donationAmount);
+            var date = new Date();
+            if ($scope.newDonationData.donationDate) 
+                date = $scope.newDonationData.donationDate;
+            if (!Number.isNaN(amt)) {
+                var donation = {};
+                donation.dateOfGift = date;
+                donation.amountOfGift = amt;
+                if (!$scope.formData.donorDataGifts) {
+                    $scope.formData.donorDataGifts = [];
+                }
+                $scope.formData.donorDataGifts.push(donation);
+                $scope.newDonationData = {};
+            }
+        }
+    };
+    
+    $scope.appendNewAdoption = function() {
+        if ($scope.newAdoptionData) {
+            var name = $scope.newAdoptionData.name;
+            var kind = $scope.newAdoptionData.kind;
+            var date = new Date();
+            if ($scope.newAdoptionData.adoptionDate) 
+                date = $scope.newAdoptionData.adoptionDate;
+            if (name && kind) {
+                var adoption = {};
+                adoption.animalName = name;
+                adoption.animalKind = kind;
+                adoption.adoptionDate = date;
+                if (!$scope.formData.adopteeDataAdoptions) {
+                    $scope.formData.adopteeDataAdoptions = [];
+                }
+                $scope.formData.adopteeDataAdoptions.push(adoption);
+                $scope.newAdoptionData = {};
+            }
+        }
     };
     
     $scope.formatPrefContact = function(v) {

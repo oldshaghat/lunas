@@ -449,12 +449,32 @@
                         </md-tab>
                         <md-tab label="Donor Data">
                             <md-content layout-padding>
-                                <div class="form-label">Donation $
-                                    <input type="text" class="form-control input-lg text-center" ng-model="formData.donationAmount">
-                                </div>
-                                <div class="form-label">Donation Date
-                                    <input type="date" class="form-control input-lg text-center" ng-model="formData.donationDate">
-                                </div>
+                                   <table class="inline-edit-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Amount ($)</th>
+                                                <th>Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="d in formData.donorDataGifts track by $index" id="$index" ng-click="editDonorData(d, $index)">
+                                                <td>{{d.amountOfGift | currency}}</td>
+                                                <td>{{d.dateOfGift | date:"MM/dd/yyyy"}}</td>
+                                            </tr>
+                                       </tbody>
+                                </table>
+                                <div layout="row">
+                                        
+                                        <md-input-container class="md-block" flex="20">
+                                                <label>Donation ($)</label>
+                                                <input type="text" class="form-control input-lg text-center" ng-model="newDonationData.donationAmount">
+                                        </md-input-container> 
+                                        <md-input-container class="md-block" flex="20">
+                                                <label>Donation Date</label>
+                                                <md-datepicker ng-model="newDonationData.donationDate"></md-datepicker>
+                                        </md-input-container> 
+                                        <button style="height:24px;margin-top:25px;" type="button" ng-click="appendNewDonation()" flex="20">Add</button>
+                                </div>  
                             </md-content>
                         </md-tab>
                         <md-tab label="Boarding Data">
@@ -471,15 +491,37 @@
                         </md-tab>
                         <md-tab label="Adopting Data">
                             <md-content layout-padding>
-                                <div class="form-label">Adoption Date
-                                    <input type="date" class="form-control input-lg text-center" ng-model="formData.adoptingDate">
-                                </div>
-                                <div class="form-label">Name
-                                    <input type="text" class="form-control input-lg text-center" ng-model="formData.adopteeName">
-                                </div>
-                                <div class="form-label">Kind (dropdown?)
-                                    <input type="text" class="form-control input-lg text-center" ng-model="formData.adopteeKind">
-                                </div>
+                                <table class="inline-edit-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Pet Name</th>
+                                            <th>Kind</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="d in formData.adopteeDataAdoptions track by $index" id="$index" ng-click="editAdoptionData(d, $index)">
+                                            <td>{{d.animalName}}</td>
+                                            <td>{{d.animalKind}}</td>
+                                            <td>{{d.adoptionDate | date:"MM/dd/yyyy"}}</td>
+                                        </tr>
+                                   </tbody>
+                                </table>
+                                <div layout="row">
+                                    <md-input-container class="md-block" flex="20">
+                                         <label>Name</label>
+                                         <input type="text" class="form-control input-lg text-center" ng-model="newAdoptionData.name">
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex="20">
+                                         <label>Kind</label>
+                                         <input type="text" class="form-control input-lg text-center" ng-model="newAdoptionData.kind">
+                                    </md-input-container> 
+                                    <md-input-container class="md-block" flex="20">
+                                         <label>Adoption Date</label>
+                                         <md-datepicker ng-model="newAdoptionData.adoptionDate"></md-datepicker>
+                                    </md-input-container> 
+                                    <button style="height:24px;margin-top:25px;" type="button" ng-click="appendNewAdoption()" flex="20">Add</button>
+                                </div>  
                             </md-content>
                         </md-tab>
                         <md-tab label="Disqualifying Data">

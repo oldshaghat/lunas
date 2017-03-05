@@ -30,6 +30,27 @@
     cursor : pointer;
 }
 
+.inline-edit-table {
+    border-collapse: collapse;
+    margin-left : 25px;
+    margin-top : 10px;
+    margin-bottom : 10px;
+    width : 40%;
+    border : solid black 1px;
+}
+.inline-edit-table > thead > tr {
+    background-color: azure;
+    border : solid black 2px;
+    padding : 4px;
+}
+.inline-edit-table > tbody > tr > td {
+    border : solid black 1px;
+    padding : 5px;
+}
+.inline-edit-table > thead > tr > th {
+    border : solid black 1px;
+}
+
 .disqualified {
     color : red;
 }
