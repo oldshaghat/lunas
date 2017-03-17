@@ -183,6 +183,7 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
         $scope.volunteerSelected[oid] = true;
         $http.get('/api/volunteers?id=' + oid)
         .then(function(response) {
+            //could I just make this $scope.formData = data? 
             var data = response.data;
             $scope.formData = {};
             $scope.formData._id = data._id;
@@ -264,6 +265,14 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
                        $scope.formData.interestsfundraising = vd.interests.fundraising;
                    if (vd.interests.events > 0)
                        $scope.formData.interestsevents = vd.interests.events;
+                   if (vd.interests.fosterCare > 0)
+                       $scope.formData.interestsfostercare = vd.interests.fosterCare;
+                    if (vd.interests.adopterEducation > 0)
+                       $scope.formData.interestsadoptereducation = vd.interests.adopterEducation;                   
+                    if (vd.interests.donationTransport > 0)
+                       $scope.formData.interestsdonationtransport = vd.interests.donationTransport;
+                   if (vd.interests.humaneEducation > 0)
+                       $scope.formData.interestshumaneeducation = vd.interests.humaneEducation;
                 }
             
                 if (vd.availability) {
@@ -302,6 +311,7 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
                         $scope.formData.availabilitysundayafternoon = vd.availability.sunday.afternoon;
                         $scope.formData.availabilitysundayevening = vd.availability.sunday.evening;
                     }
+                    $scope.formData.availabilitynotes = vd.availability.notes;
                 }
             }
             
@@ -447,9 +457,10 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
         i.push({n : 'D ', r : vd.interests.dogs});
         i.push({n : 'R ', r : vd.interests.rabbits});
         i.push({n : 'S ', r : vd.interests.smalls});
+        //Lump everything else together ? This could get large
         i.push({n : 'M ', r : vd.interests.maintenance});
         i.push({n : 'F ', r : vd.interests.fundraising});
-        i.push({n : 'E ', r : vd.interests.events});
+        i.push({n : 'E ', r : vd.interests.events});  
         i.sort(function(a, b) { return a.r - b.r;});
         
         var interestString = '';
@@ -458,7 +469,7 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
                 interestString += i[k].n;
             }
         }
-        if (interestString.length ==0 )
+        if (interestString.length ==0 )  //no op?
             return "";
         
         return interestString;

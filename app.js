@@ -333,7 +333,11 @@ app.post('/api/volunteers/' ,
             var iMnt = validateNumber(req.body.interestsmaintenance, -1);  
             var iFnd = validateNumber(req.body.interestsfundraising, -1);  
             var iEvt = validateNumber(req.body.interestsevents, -1);  
-                
+            var iFos = validateNumber(req.body.interestsfostercare, -1);
+            var iAdo = validateNumber(req.body.interestsadoptereducation, -1);
+            var iDon = validateNumber(req.body.interestsdonationtransport, -1);
+            var iHum = validateNumber(req.body.interestshumaneeducation, -1);
+    
             Volunteer.findOneAndUpdate(
                 { _id : oid },
                 {   
@@ -391,7 +395,11 @@ app.post('/api/volunteers/' ,
                             smalls : iSml,
                             maintenance : iMnt,
                             fundraising : iFnd,
-                            events : iEvt
+                            events : iEvt,
+                            fosterCare : iFos,
+                            adopterEducation : iAdo,
+                            donationTransport : iDon,
+                            humaneEducation : iHum
                         },
 
                         availability : {
@@ -429,7 +437,8 @@ app.post('/api/volunteers/' ,
                                 morning : req.body.availabilitysundaymorning,
                                 afternoon : req.body.availabilitysundayafternoon,
                                 evening : req.body.availabilitysundayevening
-                            }
+                            },
+                            notes : req.body.availabilitynotes
                         }
                     },
 
@@ -514,11 +523,47 @@ app.delete('/api/volunteers/' ,
 //////////////////
 /// Animals API
 
+function buildAnimalCriteria(req) {
+    var criteria = {}; //we're going to AND together a set of clauses 
+    return criteria;
+};
+
+function animalTableQuery(req, res) {
+    //examine the query parameters for any other filters or criteria 
+    var criteria = buildAnimalCriteria(req);
+    var options = buildPagination(req);
+    //return current list of animals
+    //plausibly we want to project here since this query drives a summary table
+    var projection = {
+
+    };
+    //count in this filter set
+    Animal.count(criteria, function(err, c) {
+        var pageCount = c / itemsPerPage;
+        Animal.find(criteria, projection, options).sort('name').exec(function(err, vtrs) {
+            if (err) 
+                res.send(err); 
+            else {
+                var paginateData = {pageCount : pageCount, data : vtrs};
+                res.json(paginateData);
+            }
+        });
+    });
+};
+
 app.get('/api/animals/',
        verifyAuth,
        function(req, res) {
-        
-        
+            if (req.query.id) {
+                Animal.findOne({ _id: req.query.id }, function (err, a) {
+                    if (err) 
+                        res.send(err); 
+                    else
+                        res.json(a);
+                });
+            } else {
+                animalTableQuery(req, res);
+            }
 });
 
 app.post('/api/animals/',

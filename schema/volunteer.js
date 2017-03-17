@@ -25,13 +25,14 @@ var VolunteerSchema = new mongoose.Schema({
     volunteerData : {
         activeVolunteer : Boolean,
         specialNeeds : Boolean,
-        foster : Boolean,
-        fostering : String,
-        noShows : Number,
+        foster : Boolean,       //is this person CURRENTLY fostering (is this in the right place?)
+        fostering : String,     //if so who
+        noShows : Number,       //times they have not shown with no warning
+        callOffs : Number,      //times they have called off 
         birthday : Date,
         started : Date,
-        lastSeen : Date, //or ... active? 
-        hoursWorked : Number,  //wee bit of future proofing
+        lastSeen : Date,        //maybe obe
+        hoursWorked : Number,   //wee bit of future proofing
         notes : String,
         partners : String,  //who supervises me (if anyone)
         dependents : String, //who do I supervise (if anyone)
@@ -64,7 +65,11 @@ var VolunteerSchema = new mongoose.Schema({
             smalls : Number,
             maintenance : Number,
             fundraising : Number,
-            events : Number
+            events : Number,
+            fosterCare : Number,
+            adopterEducation : Number,
+            donationTransport : Number,
+            humaneEducation : Number
         },
     
         //availability 
@@ -118,7 +123,7 @@ var VolunteerSchema = new mongoose.Schema({
         adoptions : [{animalName : String, animalKind : String, adoptionDate : Date}]
     },
     
-    //do they board their animals at Luna's
+    //do they board their animals at Luna's (TBD - get from Travis's system ? )
     boardingData : {
         lastBoarded : Date,
         notes : String
