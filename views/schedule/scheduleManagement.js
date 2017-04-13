@@ -280,7 +280,7 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
         for (var i = 0; i < $scope.monthData.length; i++){
             var d = $scope.monthData[i];
             if ((d.date.getMonth() === requestDate.getMonth()) && (d.date.getDate() === requestDate.getDate())){
-                console.log(d);
+                //console.log(d);
                 return d;
             }
         } 
@@ -551,19 +551,38 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
             } 
         if (period == 3) //monthly
             {
+                //what happens if we end up on something like the "fifth monday" tho? 
+                
                 //we want to repeat on the same relative timing of the month
                 //ie, 3rd tuesday, 1st monday, etc. 
                 offset = function(d) { 
+                    //getDate --> day of the month (so starting at 1)
+                    //so weekOrd is the "nth" week of the month for the day - also starting at 1. 
                     var weekOrd = Math.ceil(d.getDate()/7); //the Nth week of the month
+                    //this is 0 (Sunday) ... 6 (Saturday)
                     var dayOfMonth = d.getDay();
+                    //make a new date
                     var x = new Date(d); 
                     //make it next month
                     x.setMonth(d.getMonth() + 1); 
+                    //make it the first of next month
                     x.setDate(1);
-                    var startDay = x.getDay(); //this month starts on a ... 
-                    //set the date 
-                    var date = 1 + 7*(weekOrd - 1) + dayOfMonth - startDay;
-                    x.setDate(date);
+                    //this month starts on a ... 
+                    var startDay = x.getDay(); 
+                    
+                    //so the FIRST whatever of the month is at most 6 days away - if month starts on N+1 and we're looking for N
+                    //but this wraps - if we're looking for 0 and we're starting on 6 then that's only 1 day
+                    // 0 1 --> 6
+                    //0 2 --> 5  ...
+                    //0 6 --> 1
+                    //1 2 --> 6
+                    //1 0 --> 1
+                    var daysUntilFirstOccuranceOfTargetDate = dayOfMonth - startDay; 
+                    if (daysUntilFirstOccuranceOfTargetDate < 0) daysUntilFirstOccuranceOfTargetDate += 7;
+                    //now tack on a number of days to get teh week we want
+                    var nextDate = 1 + 7*(weekOrd -1) + daysUntilFirstOccuranceOfTargetDate;
+                    
+                    x.setDate(nextDate);
                     return x; 
                 };
             }

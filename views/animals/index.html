@@ -16,6 +16,151 @@
     
     <div ng-include="'../nav/nav.html'"></div>
     
+        <div class="filter">
+        <select class="input-lg" ng-model="filterModel.criteriaType">
+            <option value="0" selected>Status</option>
+            <option value="1">Name</option>
+            <option value="2">Kind</option>
+        </select>
+
+        <input type="text" class="input-lg" ng-model="filterModel.criteriaText" ng-show="filterModel.criteriaType=='1'">
+        <select class="input-lg" ng-model="filterModel.criteriaStatus" ng-show="filterModel.criteriaType=='0'">
+            <option value="0:In House">At Luna's</option>
+            <option value="1:Adopted">Adopted Out</option>
+        </select>
+        <select class="input-lg" ng-model="filterModel.criteriaSpecies" ng-show="filterModel.criteriaType=='2'">
+            <option value="0:Cats">Cats</option>
+            <option value="1:Dogs">Dogs</option>
+            <option value="2:Rabbits">Rabbits</option>
+            <option value="3:Smalls">Smalls</option>
+        </select>
+        <button class="btn btn-primary btn-lg" ng-click="addCriteria()">Add Filter</button>
+        <ul>
+            <li ng-repeat="f in filters"><span ng-click="removeCriteria($index)">[X]</span>{{f.summary}}</li>
+        </ul>
+        
+    </div>
+    <div class="paginationControls" layout="row">
+        <div ng-click="previousPage()">&lt;</div> Page {{currPage}} of {{totalPages}}<div ng-click="nextPage()">&gt;</div>
+    </div>
+    <table class="vlist">
+        <thead>
+            <tr class="vlistHeader">
+                <th>Name</th>
+                <th>Status</th>
+                <th>Kind</th>
+                <th>Breed</th>
+                <th>Color</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="a in animals" id="a._id" ng-click="editAnimal(a)" ng-class="{'rowSelected' : animalSelected[a._id]}">
+            <td>{{a.name}}</td>
+            <td>{{a.status}}</td>
+            <td>{{a.kind)}}</td> 
+            <td>{{a.breed}}</td>  
+            <td>{{a.color}}</td>  
+        </tr>
+        </tbody>
+    </table>
+    
+    <hr/>
+    
+    <!-- FORM TO enter/update new Animals -->
+    <div id="animal-form" class="row">
+        <div class="col-sm-8 col-sm-offset-2 text-center">
+            <form>
+                <input type="hidden" ng-model="formData._id">
+                <md-content>
+                    <md-tabs id="mainAformTabs" md-dynamic-height md-border-bottom>
+                        <md-tab label="Animal Information">
+                            <md-content layout-padding>
+                                <div layout-gt-sm="row">
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>First Name</label>
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.firstName">
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Last Name</label>
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.lastName">
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Email</label> 
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.email">
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <md-tooltip>Set true to prevent this email from being exported to bulk email reports.</md-tooltip>
+                                        <md-checkbox ng-model="formData.doNotEmail" aria-label="No Bulk?">
+                                            No Bulk?
+                                        </md-checkbox>
+                                    </md-input-container>
+                                </div>
+                                <div layout-gt-sm="row">
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Address</label>
+                                        <textarea type="text" cols="40" rows="2" class="form-control input-lg text-center" ng-model="formData.address"></textarea>
+                                    </md-input-container>
+                                </div>
+                                <div layout-gt-sm="row">
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>City</label>
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.city">
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex="15">
+                                        <label>State</label>
+                                        <md-select ng-model="formData.state">
+                                          <md-option ng-repeat="state in states" value="{{state.abbrev}}">
+                                            {{state.abbrev}}
+                                          </md-option>
+                                        </md-select>
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Zip Code</label>
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.zip">
+                                    </md-input-container>
+                                </div>
+                                <div layout-gt-sm="row">
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Home Phone Number</label>
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.phoneNumber">
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Cell Phone Number</label>
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.altPhoneNumber">
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Work Phone Number</label>
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.workPhoneNumber">
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Contact Preference?</label>
+                                        <md-select class="form-control input-lg text-center" ng-model="formData.contactPreference">
+                                            <md-option value="0">Email</md-option>
+                                            <md-option value="1">Home Phone</md-option>
+                                            <md-option value="2">SMS</md-option>
+                                            <md-option value="3">Cell Phone</md-option>
+                                            <md-option value="4">Work Phone</md-option>
+                                        </md-select> 
+                                    </md-input-container>
+                                </div>
+                                <div layout-gt-sm="row">
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Notes</label>
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.contactNotes">
+                                    </md-input-container>
+                                </div>
+                            </md-content>
+                        </md-tab>
+                    </md-tabs>
+                </md-content>
+                <button type="button" class="btn btn-primary btn-lg" ng-click="upsertAnimal()">Add/Update</button>
+                <button type="button" class="btn btn-primary btn-lg" ng-click="duplicateAnimal()">Duplicate</button>
+                <button type="button" class="btn btn-primary btn-lg" ng-click="clearForm()">Cancel</button>
+                <button type="button" class="btn btn-primary btn-lg" ng-click="deleteRecord()">Delete</button>
+                
+            </form>
+        </div>
+    </div>
     
     
     

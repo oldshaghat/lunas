@@ -237,7 +237,7 @@ function buildCriteria(req) {
     if (req.query.interests) {
         var interests = req.query.interests;
         //we expect this to be a # 0 .. 6
-        var fields = ['cats', 'dogs', 'rabbits', 'smalls', 'maintenance', 'fundraising', 'events'];
+        var fields = ['cats', 'dogs', 'rabbits', 'smalls', 'maintenance', 'fundraising', 'events']; //TODO add new interests to filter support
         var fname = 'volunteerData.interests.' + fields[interests];
         var c = {}; 
         c[fname] = {'$gt' : 0};

@@ -168,6 +168,7 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
             var oid = $scope.formData._id
             $http.delete('/api/volunteers?id=' + oid)
                 .then(function(data) {
+                    $scope.formData = {};
                     $scope.totalPages = Math.ceil(data.data.pageCount);
                     $scope.volunteers = data.data.data; //jesus christ.
                 }, function(data) {
@@ -480,7 +481,7 @@ volunteerManagement.controller('VolunteerManagementController', function Volunte
         if (!vd) return 'unav';
         var a  = vd.availability;
         if (!a) return 'unav';
-        var days = [ a.sunday, a.monday, a.tuesday, a.wednesday, a.thursday, a.friday, a.saturday];
+        var days = [  a.monday, a.tuesday, a.wednesday, a.thursday, a.friday, a.saturday,a.sunday];
         if (dayIndex >= 0 && dayIndex <= 6) {
             var d = days[dayIndex];
             if (!d) return 'unav';
