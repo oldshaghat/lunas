@@ -1,0 +1,153 @@
+
+.filter {
+    margin-top : 10px;
+    padding : 10px;
+    border : solid blue 1px;
+}
+
+.vlist > tbody > tr > td {
+    border : solid black 1px;
+    padding : 5px;
+}
+.vlistHeader > th {
+    border : solid black 1px;
+}
+.vlistHeader {
+    background-color: azure;
+    border : solid black 2px;
+    padding : 4px;
+}
+
+.vlist {
+    border-collapse: collapse;
+    margin-left : 25px;
+    margin-top : 20px;
+    margin-bottom : 10px;
+    width : 90%;
+    border : solid black 1px;
+}
+.vlist > tbody {
+    cursor : pointer;
+}
+
+.inline-edit-table {
+    border-collapse: collapse;
+    margin-left : 25px;
+    margin-top : 10px;
+    margin-bottom : 10px;
+    width : 40%;
+    border : solid black 1px;
+}
+.inline-edit-table > thead > tr {
+    background-color: azure;
+    border : solid black 2px;
+    padding : 4px;
+}
+.inline-edit-table > tbody > tr > td {
+    border : solid black 1px;
+    padding : 5px;
+}
+.inline-edit-table > thead > tr > th {
+    border : solid black 1px;
+}
+
+.disqualified {
+    color : red;
+}
+.minor {
+    background-color : lightgray; 
+}
+.rowSelected {
+    background-color: greenyellow;
+}
+
+#mainVformTabs {
+    background-color :aliceblue;
+}
+
+.schedWrap {
+    margin-left:30%;
+}
+
+.dotw {
+  display : table-cell;
+}
+
+.am {
+  width : 5px;
+  height : 5px;
+
+}
+
+.md {
+  width : 5px;
+  height : 5px;
+}
+
+.pm {
+  width : 5px;
+  height : 5px;
+}
+
+.unav {
+  background-color : #757575;
+}
+
+.av {
+  background-color : #00ee00;
+}
+
+.form-group {
+    margin : 10px;
+    border : solid 1px black;
+    padding : 10px;
+}
+
+.form-group-header {
+    font-size : 20px;
+    font-weight: 800;
+    margin : 5px;
+}
+
+.form-label {
+    height:  25px;
+    margin : 1px;
+}
+
+.av-weekday {
+    display : inline-block;
+    border : 1px solid orange;
+    text-align : left;
+    
+}
+
+.av-weekend {
+    display : inline-block;
+    border : 1px solid blue;
+    text-align : left;
+    
+}
+
+.av-timeslot {
+    text-align : right;
+}
+
+
+.filter > input, .filter > select {
+    float:none;
+    clear : none;
+}
+
+.paginationControls {
+    margin-left : 20px;
+    padding : 4px;
+}
+.paginationControls > div {
+    cursor : pointer;
+    padding-right : 5px;
+    padding-left : 5px;
+}
+
+md-input-container.md-block {
+    margin-bottom: 1px;
+}

@@ -9,30 +9,39 @@
     <script src="bower/angular-animate/angular-animate.js"></script>
     <script src="bower/angular-aria/angular-aria.js"></script>
     <script src="bower/angular-material/angular-material.js"></script>
+    <script src="../animals/menuLists.js"></script>
     <script src="../animals/animalManagement.js"></script>
 </head>
 
 <body ng-controller="AnimalManagementController">
     
-    <div ng-include="'../nav/nav.html'"></div>
+        <div ng-include="'../nav/nav.html'"></div>
     
         <div class="filter">
         <select class="input-lg" ng-model="filterModel.criteriaType">
             <option value="0" selected>Status</option>
             <option value="1">Name</option>
             <option value="2">Kind</option>
+            <option value="3">Breed</option>
         </select>
 
-        <input type="text" class="input-lg" ng-model="filterModel.criteriaText" ng-show="filterModel.criteriaType=='1'">
+        <input type="text" class="input-lg" ng-model="filterModel.criteriaText" ng-show="filterModel.criteriaType=='1' || filterModel.criteriaType=='3'">
         <select class="input-lg" ng-model="filterModel.criteriaStatus" ng-show="filterModel.criteriaType=='0'">
-            <option value="0:In House">At Luna's</option>
-            <option value="1:Adopted">Adopted Out</option>
+            ['Quarantined', 'Adoptable', 'Pending Adoption', 'Adopted', 'Deceased']
+            <option value="0:Quarantined">Quarantined</option>
+            <option value="1:Adoptable">Adoptable</option>
+            <option value="2:Pending">Pending Adoption</option>
+            <option value="3:Adopted">Adopted</option>
+            <option value="4:Deceased">Deceased</option>
         </select>
         <select class="input-lg" ng-model="filterModel.criteriaSpecies" ng-show="filterModel.criteriaType=='2'">
             <option value="0:Cats">Cats</option>
             <option value="1:Dogs">Dogs</option>
             <option value="2:Rabbits">Rabbits</option>
             <option value="3:Smalls">Smalls</option>
+            <option value="4:Birds">Birds</option>
+            <option value="5:Reptiles">Reptiles</option>
+            <option value="6:Other">Other</option>
         </select>
         <button class="btn btn-primary btn-lg" ng-click="addCriteria()">Add Filter</button>
         <ul>
@@ -50,16 +59,16 @@
                 <th>Status</th>
                 <th>Kind</th>
                 <th>Breed</th>
-                <th>Color</th>
+                <th>Sex</th>
             </tr>
         </thead>
         <tbody>
         <tr ng-repeat="a in animals" id="a._id" ng-click="editAnimal(a)" ng-class="{'rowSelected' : animalSelected[a._id]}">
             <td>{{a.name}}</td>
             <td>{{a.status}}</td>
-            <td>{{a.kind)}}</td> 
+            <td>{{a.kind}}</td> 
             <td>{{a.breed}}</td>  
-            <td>{{a.color}}</td>  
+            <td>{{a.sex}}</td>  
         </tr>
         </tbody>
     </table>
@@ -77,78 +86,268 @@
                             <md-content layout-padding>
                                 <div layout-gt-sm="row">
                                     <md-input-container class="md-block" flex-gt-sm>
-                                        <label>First Name</label>
-                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.firstName">
+                                        <label>Name</label>
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.name">
                                     </md-input-container>
                                     <md-input-container class="md-block" flex-gt-sm>
-                                        <label>Last Name</label>
-                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.lastName">
+                                        <label>Kind</label>
+                                        <md-autocomplete 
+                                             md-selected-item="formData.kind" 
+                                             md-selected-item-change="aml.kindChanged(item)"
+                                             md-search-text="aml.searchKindsText" 
+                                             md-items="item in aml.queryKinds(aml.searchKindsText)" 
+                                             md-item-text="item" 
+                                             md-min-length="0"
+                                             placeholder="What kind of animal?">
+                                            <md-item-template>
+                                               <span md-highlight-text="aml.searchKindsText">{{item}}</span>
+                                            </md-item-template>
+                                        </md-autocomplete>
                                     </md-input-container>
                                     <md-input-container class="md-block" flex-gt-sm>
-                                        <label>Email</label> 
-                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.email">
+                                        <label>Breed</label> 
+                                        <md-autocomplete 
+                                             md-selected-item="formData.breed" 
+                                             md-no-cache="true"
+                                             md-search-text="aml.searchBreedsText" 
+                                             md-items="item in aml.queryBreeds(formData.kind, aml.searchBreedsText)" 
+                                             md-item-text="item" 
+                                             md-min-length="0"
+                                             placeholder="What kind of breed?">
+                                            <md-item-template>
+                                               <span md-highlight-text="aml.searchBreedsText">{{item}}</span>
+                                            </md-item-template>
+                                        </md-autocomplete>
                                     </md-input-container>
                                     <md-input-container class="md-block" flex-gt-sm>
-                                        <md-tooltip>Set true to prevent this email from being exported to bulk email reports.</md-tooltip>
-                                        <md-checkbox ng-model="formData.doNotEmail" aria-label="No Bulk?">
-                                            No Bulk?
-                                        </md-checkbox>
+                                        <label>Sex</label>
+                                        <md-select ng-model="formData.sex">
+                                            <md-option value="Female">Female</md-option>
+                                            <md-option value="Male">Male</md-option>
+                                        </md-select>
                                     </md-input-container>
                                 </div>
                                 <div layout-gt-sm="row">
                                     <md-input-container class="md-block" flex-gt-sm>
-                                        <label>Address</label>
-                                        <textarea type="text" cols="40" rows="2" class="form-control input-lg text-center" ng-model="formData.address"></textarea>
+                                        <label>Coloration</label>
+                                        <input type="text" ng-model="formData.coloration">
                                     </md-input-container>
-                                </div>
-                                <div layout-gt-sm="row">
                                     <md-input-container class="md-block" flex-gt-sm>
-                                        <label>City</label>
-                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.city">
-                                    </md-input-container>
-                                    <md-input-container class="md-block" flex="15">
-                                        <label>State</label>
-                                        <md-select ng-model="formData.state">
-                                          <md-option ng-repeat="state in states" value="{{state.abbrev}}">
-                                            {{state.abbrev}}
+                                        <label>Coat</label>
+                                        <md-select ng-model="formData.coat">
+                                          <md-option ng-repeat="coatValue in coats" value="{{coatValue}}">
+                                            {{coatValue}}
                                           </md-option>
                                         </md-select>
                                     </md-input-container>
                                     <md-input-container class="md-block" flex-gt-sm>
-                                        <label>Zip Code</label>
-                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.zip">
+                                        <label>Size</label>
+                                        <md-select ng-model="formData.size">
+                                          <md-option ng-repeat="sizeValue in sizes" value="{{sizeValue}}">
+                                            {{sizeValue}}
+                                          </md-option>
+                                        </md-select>
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>~Weight (lbs)</label>
+                                        <input type="text" ng-model="formData.approxWeight">
                                     </md-input-container>
                                 </div>
                                 <div layout-gt-sm="row">
                                     <md-input-container class="md-block" flex-gt-sm>
-                                        <label>Home Phone Number</label>
-                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.phoneNumber">
+                                        <label>Birthday</label>
+                                        <md-datepicker ng-model="formData.birthday"></md-datepicker>
                                     </md-input-container>
                                     <md-input-container class="md-block" flex-gt-sm>
-                                        <label>Cell Phone Number</label>
-                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.altPhoneNumber">
+                                        <md-tooltip>Is the birthday a guess?</md-tooltip>
+                                        <md-checkbox ng-model="formData.birthdayApproximated">
+                                            Approximated?
+                                        </md-checkbox>
                                     </md-input-container>
                                     <md-input-container class="md-block" flex-gt-sm>
-                                        <label>Work Phone Number</label>
-                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.workPhoneNumber">
+                                        <md-tooltip>Snippy snippy?</md-tooltip>
+                                        <md-checkbox ng-model="formData.altered">
+                                            Altered?
+                                        </md-checkbox>
                                     </md-input-container>
                                     <md-input-container class="md-block" flex-gt-sm>
-                                        <label>Contact Preference?</label>
-                                        <md-select class="form-control input-lg text-center" ng-model="formData.contactPreference">
-                                            <md-option value="0">Email</md-option>
-                                            <md-option value="1">Home Phone</md-option>
-                                            <md-option value="2">SMS</md-option>
-                                            <md-option value="3">Cell Phone</md-option>
-                                            <md-option value="4">Work Phone</md-option>
-                                        </md-select> 
+                                        <label>Alteration Date</label>
+                                        <md-datepicker ng-model="formData.alteredDate"></md-datepicker>
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <md-tooltip>Is the animal housed off site?</md-tooltip>
+                                        <md-checkbox ng-model="formData.fostered">
+                                            Fostered?
+                                        </md-checkbox>
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Status</label>
+                                        <md-select ng-model="formData.status">
+                                          <md-option ng-repeat="statusValue in statuses" value="{{statusValue}}">
+                                            {{statusValue}}
+                                          </md-option>
+                                        </md-select>
                                     </md-input-container>
                                 </div>
                                 <div layout-gt-sm="row">
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Appearance Notes</label>
+                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.descriptionNotes">
+                                    </md-input-container>
+                                </div>
+                            </md-content>
+                        </md-tab>
+                        <md-tab label="Health & Behavior">
+                            <md-content layout-padding>
+                                <div layout="row">
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <md-tooltip>Has the animal been chipped?</md-tooltip>
+                                        <md-checkbox ng-model="formData.microchipped">
+                                            Chipped?
+                                        </md-checkbox>
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Chipped Date</label>
+                                        <md-datepicker ng-model="formData.chippedDate"></md-datepicker>
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Chip ID</label>
+                                        <input type="text" ng-model="formData.chipId">
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Chip Model</label>
+                                        <input type="text" ng-model="formData.chipModel">
+                                    </md-input-container>
+                                </div>
+                                <div layout="row">
+                                     <md-input-container class="md-block" flex-gt-sm>
+                                        <md-checkbox ng-model="formData.housetrained">
+                                            Housetrained?
+                                        </md-checkbox>
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm ng-show="formData.kind == 'Cat'">
+                                        <md-checkbox ng-model="formData.isDeclawed">
+                                            Declawed? (grr)
+                                        </md-checkbox>
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm ng-show="formData.kind == 'Cat'">
+                                        <md-checkbox ng-model="formData.fivlTested">
+                                            FIV/L Tested?
+                                        </md-checkbox>
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm ng-show="formData.kind == 'Cat'">
+                                        <md-checkbox ng-model="formData.fivPositive">
+                                            FIV Positive?
+                                        </md-checkbox>
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm ng-show="formData.kind == 'Cat'">
+                                        <md-checkbox ng-model="formData.flvPositive">
+                                            FLV Positive?
+                                        </md-checkbox>
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm ng-show="formData.kind == 'Dog'">
+                                        <md-checkbox ng-model="formData.heartwormTested">
+                                            Heartworm Tested?
+                                        </md-checkbox>
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm ng-show="formData.kind == 'Dog'">
+                                        <md-checkbox ng-model="formData.heartwormPositive">
+                                            Heartworm Positive?
+                                        </md-checkbox>
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm ng-show="formData.kind == 'Dog'">
+                                        <label>Rabies Tag</label>
+                                        <input type="text" ng-model="formData.rabiesTag">
+                                    </md-input-container>
+                                </div>
+                                <div layout="row">
+                                     <md-input-container class="md-block" flex-gt-sm>
+                                        <md-checkbox ng-model="formData.getsAlongWithKids">
+                                            Gets along with kids?
+                                        </md-checkbox>
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <md-checkbox ng-model="formData.getsAlongWithCats">
+                                            Gets along with cats?
+                                        </md-checkbox>
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm >
+                                        <md-checkbox ng-model="formData.getsAlongWithDogs">
+                                            Gets along with dogs?
+                                        </md-checkbox>
+                                    </md-input-container>
+                                </div>
+                                <div layout="row">
+                                     <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Litter Notes</label>
+                                        <input type="text" ng-model="formData.litterNotes">
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Bonded With</label>
+                                        <input type="text" ng-model="formData.bondedWith">
+                                    </md-input-container>
+                                </div>
+                                <div layout="row">
+                                     <md-input-container class="md-block" flex-gt-sm>
+                                        <label>Health Notes</label>
+                                        <input type="text" ng-model="formData.healthNotes">
+                                    </md-input-container>
+                                </div>
+                            </md-content>
+                        </md-tab>
+                        <md-tab label="Transfers">
+                            <md-content layout-padding>
+                                <table class="inline-edit-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Type</th>
+                                                <th>From</th>
+                                                <th>To</th>
+                                                <th>Notes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="d in formData.transfers track by $index" id="$index" ng-click="editTransferData(d, $index)">
+                                                <td>{{d.date | date:"MM/dd/yyyy"}}</td>
+                                                <td>{{d.kind}}</td>
+                                                <td>{{d.origin}}</td>
+                                                <td>{{d.dest}}</td>
+                                                <td>{{d.notes}}</td>
+                                            </tr>
+                                       </tbody>
+                                </table>
+                                <div layout="row">
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                            <label>Transfer Date</label>
+                                            <md-datepicker ng-model="transferData.date"></md-datepicker>
+                                    </md-input-container> 
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                            <label>Type</label>
+                                            <md-select ng-model="transferData.kind">
+                                                <md-option ng-repeat="tx in transferTypes" value="{{tx}}">
+                                                    {{tx}}
+                                                </md-option>
+                                            </md-select>
+                                    </md-input-container> 
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>From</label>
+                                        <input type="text" ng-model="transferData.origin">
+                                    </md-input-container>
+                                    <md-input-container class="md-block" flex-gt-sm>
+                                        <label>To</label>
+                                        <input type="text" ng-model="transferData.dest">
+                                    </md-input-container>
+                                </div>
+                                <div layout="row">
                                     <md-input-container class="md-block" flex-gt-sm>
                                         <label>Notes</label>
-                                        <input type="text" class="form-control input-lg text-center" ng-model="formData.contactNotes">
+                                        <input type="text" ng-model="transferData.notes">
                                     </md-input-container>
                                 </div>
+                                <div layout="row">
+                                        <button style="height:24px;margin-top:25px;" type="button" ng-click="appendNewTransfer()" flex="20">Add</button>
+                                </div>  
                             </md-content>
                         </md-tab>
                     </md-tabs>

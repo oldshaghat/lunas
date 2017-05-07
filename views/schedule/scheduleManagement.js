@@ -552,38 +552,52 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
         if (period == 3) //monthly
             {
                 //what happens if we end up on something like the "fifth monday" tho? 
+                //ah this does happen. crazy.
+                //and we want to SKIP those months that don't have a fifth monday. 
                 
                 //we want to repeat on the same relative timing of the month
                 //ie, 3rd tuesday, 1st monday, etc. 
                 offset = function(d) { 
-                    //getDate --> day of the month (so starting at 1)
-                    //so weekOrd is the "nth" week of the month for the day - also starting at 1. 
-                    var weekOrd = Math.ceil(d.getDate()/7); //the Nth week of the month
-                    //this is 0 (Sunday) ... 6 (Saturday)
-                    var dayOfMonth = d.getDay();
-                    //make a new date
-                    var x = new Date(d); 
-                    //make it next month
-                    x.setMonth(d.getMonth() + 1); 
-                    //make it the first of next month
-                    x.setDate(1);
-                    //this month starts on a ... 
-                    var startDay = x.getDay(); 
+                    var maxAttempts = 10; //fifth days repeat every 5 months at max
+                    var attempt = 0;
                     
-                    //so the FIRST whatever of the month is at most 6 days away - if month starts on N+1 and we're looking for N
-                    //but this wraps - if we're looking for 0 and we're starting on 6 then that's only 1 day
-                    // 0 1 --> 6
-                    //0 2 --> 5  ...
-                    //0 6 --> 1
-                    //1 2 --> 6
-                    //1 0 --> 1
-                    var daysUntilFirstOccuranceOfTargetDate = dayOfMonth - startDay; 
-                    if (daysUntilFirstOccuranceOfTargetDate < 0) daysUntilFirstOccuranceOfTargetDate += 7;
-                    //now tack on a number of days to get teh week we want
-                    var nextDate = 1 + 7*(weekOrd -1) + daysUntilFirstOccuranceOfTargetDate;
-                    
-                    x.setDate(nextDate);
-                    return x; 
+                    while(attempt < maxAttempts) {
+                        attempt++;
+                        //getDate --> day of the month (so starting at 1)
+                        //so weekOrd is the "nth" week of the month for the day - also starting at 1. 
+                        var weekOrd = Math.ceil(d.getDate()/7); //the Nth week of the month
+                        //this is 0 (Sunday) ... 6 (Saturday)
+                        var dayOfMonth = d.getDay();
+                        //make a new date
+                        var x = new Date(d); 
+                        //set the date to the first so our month additions don't unexpectedly wrap to a later month
+                        x.setDate(1);
+                        //make it next month (or next next, or next^3 ... )
+                        var desiredMonth = d.getMonth() + attempt;
+                        x.setMonth(desiredMonth); 
+                        //that might have wrapped the year on us 
+                        if (desiredMonth >= 12) desiredMonth = desiredMonth - 12;
+                        //this month starts on a ... 
+                        var startDay = x.getDay(); 
+
+                        //so the FIRST whatever of the month is at most 6 days away - if month starts on N+1 and we're looking for N
+                        //but this wraps - if we're looking for 0 and we're starting on 6 then that's only 1 day
+                        // 0 1 --> 6
+                        //0 2 --> 5  ...
+                        //0 6 --> 1
+                        //1 2 --> 6
+                        //1 0 --> 1
+                        var daysUntilFirstOccuranceOfTargetDate = dayOfMonth - startDay; 
+                        if (daysUntilFirstOccuranceOfTargetDate < 0) daysUntilFirstOccuranceOfTargetDate += 7;
+                        //now tack on a number of days to get teh week we want
+                        var nextDate = 1 + 7*(weekOrd -1) + daysUntilFirstOccuranceOfTargetDate;
+                        x.setDate(nextDate);
+
+                        if (x.getMonth() == desiredMonth)
+                            return x; 
+                    }
+                    //I guess we couldn't find one that worked?
+                    return null;
                 };
             }
         
@@ -605,6 +619,7 @@ scheduleManagement.controller('ScheduleManagementController', function ScheduleM
         }
         while (!done(d, i)) {
             d = offset(d);
+            if (d == null) break;
             out.push(d);
             i++;
         }

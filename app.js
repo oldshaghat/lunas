@@ -569,15 +569,42 @@ app.get('/api/animals/',
 app.post('/api/animals/',
        verifyAuth,
        function(req, res) {
-        
-        
+            //if the body doesn't supply an ID we are inserting a new one
+            var oid = req.body._id;
+            if (!oid) {
+                oid = new mongoose.mongo.ObjectID();
+            }
+            //VALIDATION / defaulting
+//            var hoursValue = validateNumber(req.body.hoursWorked, 0); 
+        Animal.findOneAndUpdate(
+                { _id : oid },
+            req.body,       //maybe we can just ... pass the body directly? 
+            { upsert : true },
+            function(err, ani) {
+                if (err) {
+                    console.log(err);
+                    res.redirect('/adb'); 
+                } else {
+                    animalTableQuery(req, res);
+                }
+            });
 });
 
 app.delete('/api/animals/',
        verifyAuth,
        function(req, res) {
-        
-        
+            if (!req.query.id) {
+                 Animal.find(function(err, animals) {
+                    if (err) res.send(err);
+                    res.json(animals);
+                });
+            }
+            //Also / first remove this volunteer from any schedules
+           Animal.remove(
+                { _id : req.query.id },
+                function (err, r) {
+                    animalTableQuery(req, res);
+                });
 });
 
 ///////////////////////////

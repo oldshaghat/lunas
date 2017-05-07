@@ -5,8 +5,52 @@ var animalManagement = angular.module('animalManagement', ['ngMaterial'])
 
 animalManagement.controller('AnimalManagementController', function AnimalManagementController($scope, $http) {
     
+    
+    //set up lists and queries for animal breeds 
+    $scope.aml = {};
+    $scope.aml.searchKindsText = '';
+    $scope.aml.queryKinds = function(q) {
+        return q ? animalMenuLists.kinds.filter(createFilterFor(q)) : animalMenuLists.kinds;
+    };
+    $scope.aml.kindChanged = function(k) {
+        //grr. if I don't use this then it's possible to make a lop dog ... validation? 
+        //insulator? but .. ugh
+     //    $scope.formData.breed = '';
+    }
+    $scope.aml.searchBreedsText = '';
+    $scope.aml.queryBreeds = function(k, q) {
+        if (!k) return [];
+        var b = [];
+        if (k === animalMenuLists.kinds[0]) b = animalMenuLists.birdBreeds;
+        else if (k === animalMenuLists.kinds[1]) b = animalMenuLists.catBreeds;
+        else if (k === animalMenuLists.kinds[2]) b = animalMenuLists.dogBreeds;
+        else if (k === animalMenuLists.kinds[3]) b = animalMenuLists.rabbitBreeds;
+        else if (k === animalMenuLists.kinds[4]) b = animalMenuLists.smallBreeds;
+        else if (k === animalMenuLists.kinds[5]) b = animalMenuLists.reptileBreeds;
+        else if (k === animalMenuLists.kinds[6]) b = animalMenuLists.otherBreeds;
+        return q ? b.filter(createFilterFor(q)) : b;
+    };
+    // ['Bird', 'Cat', 'Dog', 'Rabbit', 'Small', 'Reptile', 'Other'];
+    
+    function createFilterFor(query) {
+      var lowercaseQuery = angular.lowercase(query);
+
+      return function filterFn(v) {
+        var lv = angular.lowercase(v);
+        return (lv.indexOf(lowercaseQuery) === 0);
+      };
+    }
+    
+    $scope.sizes = ['Small', 'Medium', 'Large', 'Very Large'];
+    $scope.coats = ['Short', 'Medium', 'Long', 'Rough', 'Curly', 'Hairless'];
+    $scope.statuses = ['Quarantined', 'Adoptable', 'Pending Adoption', 'Adopted', 'Deceased'];
+    //should these be objects that know in vs out?
+    $scope.transferTypes = ['Surrender', 'Transfer In', 'Stray', 'Animal Control', 'Return', 'Reclaim', 'Adoption', 'Transfer Out', 'Deceased'];
+    
     $scope.currPage = 1;
     $scope.totalPages = 1;
+    $scope.transferData = {};
+    
     
     $scope.previousPage = function() {
         if ($scope.currPage > 1) {
@@ -52,7 +96,11 @@ animalManagement.controller('AnimalManagementController', function AnimalManagem
     
     $scope.clearForm = function() {
         $scope.formData = {};
+        $scope.transferData = {}
         $scope.animalSelected = [];
+        $scope.aml.searchKindsText = '';
+        $scope.aml.searchBreedsText = '';
+        
     };
     
  
@@ -77,25 +125,25 @@ animalManagement.controller('AnimalManagementController', function AnimalManagem
     
     $scope.addCriteria = function() {
         //look to see what was selected
-        if ($scope.filterModel.criteriaType == 0) {
-            var term = $scope.filterModel.criteriaText;
-            term = escapeRegExp(term);
-            var f = {summary : 'Email contains ' + term, kind : 'email', term : term};
-            addOrUpdateFilter(f);
-        }
-        else if ($scope.filterModel.criteriaType == 1) {
-            var term = $scope.filterModel.criteriaText;
-            term = escapeRegExp(term);
-            var f = {summary : 'Name contains ' + term, kind : 'name', term : term};
-            addOrUpdateFilter(f);
-        }
-        else if ($scope.filterModel.criteriaType == 2) {
-            var term = $scope.filterModel.criteriaTraining;
-            var code = term.split(":")[0];
-            var desc = term.split(":")[1];
-            var f = {summary : 'Training for  ' + desc, kind : 'training', term : code};
-            addOrUpdateFilter(f);
-        }
+//        if ($scope.filterModel.criteriaType == 0) {
+//            var term = $scope.filterModel.criteriaText;
+//            term = escapeRegExp(term);
+//            var f = {summary : 'Email contains ' + term, kind : 'email', term : term};
+//            addOrUpdateFilter(f);
+//        }
+//        else if ($scope.filterModel.criteriaType == 1) {
+//            var term = $scope.filterModel.criteriaText;
+//            term = escapeRegExp(term);
+//            var f = {summary : 'Name contains ' + term, kind : 'name', term : term};
+//            addOrUpdateFilter(f);
+//        }
+//        else if ($scope.filterModel.criteriaType == 2) {
+//            var term = $scope.filterModel.criteriaTraining;
+//            var code = term.split(":")[0];
+//            var desc = term.split(":")[1];
+//            var f = {summary : 'Training for  ' + desc, kind : 'training', term : code};
+//            addOrUpdateFilter(f);
+//        }
         queryTableData();
         
         $scope.filterModel = {};
@@ -150,6 +198,9 @@ animalManagement.controller('AnimalManagementController', function AnimalManagem
         $http.get('/api/animals?id=' + oid)
         .then(function(response) {
             var data = response.data;
+            if (data.birthday) {data.birthday = new Date(data.birthday);}
+            if (data.alteredDate) {data.alteredDate = new Date(data.alteredDate);}
+            if (data.chippedDate) {data.chippedDate = new Date(data.chippedDate);}
             $scope.formData = data;
             //try to be simple maybe this time
             
@@ -159,5 +210,24 @@ animalManagement.controller('AnimalManagementController', function AnimalManagem
     
     };
     
+    $scope.appendNewTransfer = function() {
+        if ($scope.transferData) {
+            var t = {};
+            t.date = new Date(); //default to today
+            if ($scope.transferData.date) {
+                t.date = $scope.transferData.date;
+            }
+            t.kind = $scope.transferData.kind;
+            t.origin = $scope.transferData.origin;
+            t.dest = $scope.transferData.dest;
+            t.notes = $scope.transferData.notes;
+            
+            if (!$scope.formData.transfers) {
+                $scope.formData.transfers = [];
+            }
+            $scope.formData.transfers.push(t);
+            $scope.transferData = {};
+        }
+    };
     
-};
+});
