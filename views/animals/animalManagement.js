@@ -46,6 +46,7 @@ animalManagement.controller('AnimalManagementController', function AnimalManagem
     $scope.statuses = ['Quarantined', 'Adoptable', 'Pending Adoption', 'Adopted', 'Deceased'];
     //should these be objects that know in vs out?
     $scope.transferTypes = ['Surrender', 'Transfer In', 'Stray', 'Animal Control', 'Return', 'Reclaim', 'Adoption', 'Transfer Out', 'Deceased'];
+    $scope.locationType = ["Luna's", 'Individual', 'Other Shelter', 'Other'];
     
     $scope.currPage = 1;
     $scope.totalPages = 1;
@@ -202,10 +203,9 @@ animalManagement.controller('AnimalManagementController', function AnimalManagem
             if (data.alteredDate) {data.alteredDate = new Date(data.alteredDate);}
             if (data.chippedDate) {data.chippedDate = new Date(data.chippedDate);}
             $scope.formData = data;
-            //try to be simple maybe this time
             
         }, function(data) {
-            console.log(data);
+            console.log('Error: ' + data);
         });
     
     };
@@ -219,7 +219,9 @@ animalManagement.controller('AnimalManagementController', function AnimalManagem
             }
             t.kind = $scope.transferData.kind;
             t.origin = $scope.transferData.origin;
+            t.originType = $scope.transferData.originType;
             t.dest = $scope.transferData.dest;
+            t.destType = $scope.transferData.destType;
             t.notes = $scope.transferData.notes;
             
             if (!$scope.formData.transfers) {
@@ -230,4 +232,38 @@ animalManagement.controller('AnimalManagementController', function AnimalManagem
         }
     };
     
+   //  $scope.transferTypes = ['Surrender', 'Transfer In', 'Stray', 'Animal Control', 'Return', 'Reclaim', 'Adoption', 'Transfer Out', 'Deceased'];
+   
+    $scope.transferKindChanged = function() {
+        //pre-set the From and To based on the transfer kind : assume that some are Luna's coming in and others are Luna's going out.
+            $scope.transferData.originType = "";
+            $scope.transferData.destType = "";
+        if (
+            $scope.transferData.kind == $scope.transferTypes[0] || 
+            $scope.transferData.kind == $scope.transferTypes[1] || 
+            $scope.transferData.kind == $scope.transferTypes[2] || 
+            $scope.transferData.kind == $scope.transferTypes[3] || 
+            $scope.transferData.kind == $scope.transferTypes[4] || 
+            $scope.transferData.kind == $scope.transferTypes[5]  
+           ) {
+            $scope.transferData.originType = "";
+            $scope.transferData.destType = "Luna's";
+        } else if (
+            $scope.transferData.kind == $scope.transferTypes[6] || 
+            $scope.transferData.kind == $scope.transferTypes[7]
+        ){
+            $scope.transferData.originType = "Luna's";
+            $scope.transferData.destType = "";
+        }
+            
+    };
+    
+    $scope.formatTransferOrigin = function(d) {
+        if (d.originType == "Luna's") return "Luna's"; 
+        else return d.originType + " : " + d.origin; 
+    };
+    $scope.formatTransferDestination = function(d) {
+        if (d.destType == "Luna's") return "Luna's"; 
+        else return d.destType + " : " + d.dest; 
+    }
 });

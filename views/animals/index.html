@@ -311,8 +311,8 @@
                                             <tr ng-repeat="d in formData.transfers track by $index" id="$index" ng-click="editTransferData(d, $index)">
                                                 <td>{{d.date | date:"MM/dd/yyyy"}}</td>
                                                 <td>{{d.kind}}</td>
-                                                <td>{{d.origin}}</td>
-                                                <td>{{d.dest}}</td>
+                                                <td>{{formatTransferOrigin(d)}}</td>
+                                                <td>{{formatTransferDestination(d)}}</td>
                                                 <td>{{d.notes}}</td>
                                             </tr>
                                        </tbody>
@@ -324,18 +324,34 @@
                                     </md-input-container> 
                                     <md-input-container class="md-block" flex-gt-sm>
                                             <label>Type</label>
-                                            <md-select ng-model="transferData.kind">
+                                            <md-select ng-model="transferData.kind" md-on-close="transferKindChanged()">
                                                 <md-option ng-repeat="tx in transferTypes" value="{{tx}}">
                                                     {{tx}}
                                                 </md-option>
                                             </md-select>
                                     </md-input-container> 
                                     <md-input-container class="md-block" flex-gt-sm>
-                                        <label>From</label>
+                                            <label>From</label>
+                                            <md-select ng-model="transferData.originType">
+                                                <md-option ng-repeat="tx in locationType" value="{{tx}}">
+                                                    {{tx}}
+                                                </md-option>
+                                            </md-select>
+                                    </md-input-container> 
+                                    <md-input-container class="md-block" flex-gt-sm ng-show="transferData.originType.indexOf('Luna') < 0">
+                                        <label>From Detail</label>
                                         <input type="text" ng-model="transferData.origin">
                                     </md-input-container>
                                     <md-input-container class="md-block" flex-gt-sm>
-                                        <label>To</label>
+                                            <label>To</label>
+                                            <md-select ng-model="transferData.destType">
+                                                <md-option ng-repeat="tx in locationType" value="{{tx}}">
+                                                    {{tx}}
+                                                </md-option>
+                                            </md-select>
+                                    </md-input-container> 
+                                    <md-input-container class="md-block" flex-gt-sm ng-show="transferData.destType.indexOf('Luna') < 0">
+                                        <label>To Detail</label>
                                         <input type="text" ng-model="transferData.dest">
                                     </md-input-container>
                                 </div>
@@ -346,7 +362,7 @@
                                     </md-input-container>
                                 </div>
                                 <div layout="row">
-                                        <button style="height:24px;margin-top:25px;" type="button" ng-click="appendNewTransfer()" flex="20">Add</button>
+                                        <button style="height:24px;margin-top:25px;" type="button" ng-click="appendNewTransfer()" flex="20">Add Transfer</button>
                                 </div>  
                             </md-content>
                         </md-tab>

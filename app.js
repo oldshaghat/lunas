@@ -575,19 +575,19 @@ app.post('/api/animals/',
                 oid = new mongoose.mongo.ObjectID();
             }
             //VALIDATION / defaulting
-//            var hoursValue = validateNumber(req.body.hoursWorked, 0); 
-        Animal.findOneAndUpdate(
+            req.body.approxWeight = validateNumber(req.body.approxWeight, 0);
+            Animal.findOneAndUpdate(
                 { _id : oid },
-            req.body,       //maybe we can just ... pass the body directly? 
-            { upsert : true },
-            function(err, ani) {
-                if (err) {
-                    console.log(err);
-                    res.redirect('/adb'); 
-                } else {
-                    animalTableQuery(req, res);
-                }
-            });
+                req.body,       //maybe we can just ... pass the body directly? assuming we've validated everything anyway
+                { upsert : true },
+                function(err, ani) {
+                    if (err) {
+                        console.log(err);
+                        res.redirect('/adb'); 
+                    } else {
+                        animalTableQuery(req, res);
+                    }
+                });
 });
 
 app.delete('/api/animals/',
