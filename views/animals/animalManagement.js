@@ -43,15 +43,15 @@ animalManagement.controller('AnimalManagementController', function AnimalManagem
     
     $scope.sizes = ['Small', 'Medium', 'Large', 'Very Large'];
     $scope.coats = ['Short', 'Medium', 'Long', 'Rough', 'Curly', 'Hairless'];
-    $scope.statuses = ['Quarantined', 'Adoptable', 'Pending Adoption', 'Adopted', 'Deceased'];
+    $scope.statuses = ['Quarantined', 'Adoptable', 'Pending Adoption', 'Adopted', 'Archive', 'Deceased'];
     //should these be objects that know in vs out?
-    $scope.transferTypes = ['Surrender', 'Transfer In', 'Stray', 'Animal Control', 'Return', 'Reclaim', 'Adoption', 'Transfer Out', 'Deceased'];
+    $scope.transferTypes = ['Surrender', 'Transfer In', 'Stray', 'Animal Control', 'Return', 'Reclaim', 'Foster', 'Adoption', 'Transfer Out', 'Deceased'];
     $scope.locationType = ["Luna's", 'Individual', 'Other Shelter', 'Other'];
     
     $scope.currPage = 1;
     $scope.totalPages = 1;
     $scope.transferData = {};
-    
+    $scope.transferRowSelected = [];
     
     $scope.previousPage = function() {
         if ($scope.currPage > 1) {
@@ -99,6 +99,7 @@ animalManagement.controller('AnimalManagementController', function AnimalManagem
         $scope.formData = {};
         $scope.transferData = {}
         $scope.animalSelected = [];
+        $scope.transferRowSelected = [];
         $scope.aml.searchKindsText = '';
         $scope.aml.searchBreedsText = '';
         
@@ -126,25 +127,32 @@ animalManagement.controller('AnimalManagementController', function AnimalManagem
     
     $scope.addCriteria = function() {
         //look to see what was selected
-//        if ($scope.filterModel.criteriaType == 0) {
-//            var term = $scope.filterModel.criteriaText;
-//            term = escapeRegExp(term);
-//            var f = {summary : 'Email contains ' + term, kind : 'email', term : term};
-//            addOrUpdateFilter(f);
-//        }
-//        else if ($scope.filterModel.criteriaType == 1) {
-//            var term = $scope.filterModel.criteriaText;
-//            term = escapeRegExp(term);
-//            var f = {summary : 'Name contains ' + term, kind : 'name', term : term};
-//            addOrUpdateFilter(f);
-//        }
-//        else if ($scope.filterModel.criteriaType == 2) {
-//            var term = $scope.filterModel.criteriaTraining;
-//            var code = term.split(":")[0];
-//            var desc = term.split(":")[1];
-//            var f = {summary : 'Training for  ' + desc, kind : 'training', term : code};
-//            addOrUpdateFilter(f);
-//        }
+        if ($scope.filterModel.criteriaType == 0) {
+            var term = $scope.filterModel.criteriaStatus;
+            var code = term.split(":")[0];
+            var desc = term.split(":")[1];
+            var f = {summary : 'Status is ' + desc, kind : 'status', term : code};
+            addOrUpdateFilter(f);
+        }
+        else if ($scope.filterModel.criteriaType == 1) {
+            var term = $scope.filterModel.criteriaText;
+            term = escapeRegExp(term);
+            var f = {summary : 'Name contains ' + term, kind : 'name', term : term};
+            addOrUpdateFilter(f);
+        }
+        else if ($scope.filterModel.criteriaType == 2) {
+            var term = $scope.filterModel.criteriaSpecies;
+            var code = term.split(":")[0];
+            var desc = term.split(":")[1];
+            var f = {summary : 'Kind of animal is ' + desc, kind : 'group', term : code};
+            addOrUpdateFilter(f);
+        }
+        else if ($scope.filterModel.criteriaType == 3) {
+            var term = $scope.filterModel.criteriaText;
+            term = escapeRegExp(term);
+            var f = {summary : 'Breed name contains ' + term, kind : 'breed', term : term};
+            addOrUpdateFilter(f);
+        }
         queryTableData();
         
         $scope.filterModel = {};
@@ -210,30 +218,91 @@ animalManagement.controller('AnimalManagementController', function AnimalManagem
     
     };
     
+    function copyTransferData(src, dest) {
+        if (src.date) {
+            dest.date = $scope.transferData.date;
+        }
+        dest.kind = src.kind;
+        dest.origin = src.origin;
+        dest.originType = src.originType;
+        dest.dest = src.dest;
+        dest.destType = src.destType;
+        dest.notes = src.notes;
+    }
+    
+   // should adding a transfer prompt to change status automatically?      $scope.statuses = ['Quarantined', 'Adoptable', 'Pending Adoption', 'Adopted', 'Archive', Deceased'];
     $scope.appendNewTransfer = function() {
         if ($scope.transferData) {
-            var t = {};
-            t.date = new Date(); //default to today
-            if ($scope.transferData.date) {
-                t.date = $scope.transferData.date;
+            if ($scope.updating || $scope.transferData._id) {
+                //we are updating an existing transfer : 
+                var index = $scope.transferRowSelected.indexOf(true);
+                var t = $scope.formData.transfers[index];
+                
+                //we expect this is just correcting older data and therefore doesn't update animal status
+                copyTransferData($scope.transferData, t);
+                
+            } else {
+                var t = {};
+                t.date = new Date(); //default to today
+                copyTransferData($scope.transferData, t);
+                
+                //if some kind of transfer occurs, we assume it isn't fostered unless said so
+                $scope.formData.fostered = false;
+                //if we're recording a transfer of an intake then assume it's quarantined
+                var tti = $scope.transferTypes.indexOf(t.kind);
+                if (tti == 6) { //foster
+                    //confirm? 
+                    $scope.formData.fostered = true;
+                    //maybe make the status adoptable or pending but we don't want to overwrite that I think? 
+                }
+                if (tti >= 0 && tti < 6) {
+                    $scope.formData.status = $scope.statuses[0]; // Q
+                }
+                if (tti == 7) {
+                    $scope.formData.status = $scope.statuses[3]; // Adopted
+                }
+                if (tti == 8) {
+                    $scope.formData.status = $scope.statuses[4]; // Arch
+                }
+                if (tti == 9) {
+                    $scope.formData.status = $scope.statuses[5]; // :(
+                }
+
+                if (!$scope.formData.transfers) {
+                    $scope.formData.transfers = [];
+                }
+                $scope.formData.transfers.push(t);
             }
-            t.kind = $scope.transferData.kind;
-            t.origin = $scope.transferData.origin;
-            t.originType = $scope.transferData.originType;
-            t.dest = $scope.transferData.dest;
-            t.destType = $scope.transferData.destType;
-            t.notes = $scope.transferData.notes;
-            
-            if (!$scope.formData.transfers) {
-                $scope.formData.transfers = [];
-            }
-            $scope.formData.transfers.push(t);
             $scope.transferData = {};
+            $scope.transferRowSelected = [];
         }
     };
     
-   //  $scope.transferTypes = ['Surrender', 'Transfer In', 'Stray', 'Animal Control', 'Return', 'Reclaim', 'Adoption', 'Transfer Out', 'Deceased'];
-   
+    $scope.editTransferData = function(data, index) {
+        $scope.transferRowSelected = [];
+        $scope.transferRowSelected[index] = true;
+        $scope.transferData.date = new Date(data.date);
+        $scope.transferData.kind = data.kind;
+        $scope.transferData.origin = data.origin;
+        $scope.transferData.originType = data.originType;
+        $scope.transferData.dest = data.dest;
+        $scope.transferData.destType = data.destType;
+        $scope.transferData.notes = data.notes;
+        //this isn't reliable = the transfer might not have been committed to the DB yet
+        $scope.transferData._id = data._id; 
+        $scope.transferData.updating = true;
+    };
+    
+    $scope.deleteTransfer = function() {
+        var index = $scope.transferRowSelected.indexOf(true);
+        if (index >= 0) {
+            $scope.formData.transfers.splice(index, 1);
+            $scope.transferData = {};
+            $scope.transferRowSelected = [];
+        }
+    }
+    
+   //  $scope.transferTypes = ['Surrender', 'Transfer In', 'Stray', 'Animal Control', 'Return', 'Reclaim', 'Foster', Adoption', 'Transfer Out', 'Deceased'];
     $scope.transferKindChanged = function() {
         //pre-set the From and To based on the transfer kind : assume that some are Luna's coming in and others are Luna's going out.
             $scope.transferData.originType = "";
@@ -250,7 +319,8 @@ animalManagement.controller('AnimalManagementController', function AnimalManagem
             $scope.transferData.destType = "Luna's";
         } else if (
             $scope.transferData.kind == $scope.transferTypes[6] || 
-            $scope.transferData.kind == $scope.transferTypes[7]
+            $scope.transferData.kind == $scope.transferTypes[7] ||
+            $scope.transferData.kind == $scope.transferTypes[8]
         ){
             $scope.transferData.originType = "Luna's";
             $scope.transferData.destType = "";

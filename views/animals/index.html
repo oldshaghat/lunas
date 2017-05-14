@@ -27,7 +27,6 @@
 
         <input type="text" class="input-lg" ng-model="filterModel.criteriaText" ng-show="filterModel.criteriaType=='1' || filterModel.criteriaType=='3'">
         <select class="input-lg" ng-model="filterModel.criteriaStatus" ng-show="filterModel.criteriaType=='0'">
-            ['Quarantined', 'Adoptable', 'Pending Adoption', 'Adopted', 'Deceased']
             <option value="0:Quarantined">Quarantined</option>
             <option value="1:Adoptable">Adoptable</option>
             <option value="2:Pending">Pending Adoption</option>
@@ -308,7 +307,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-repeat="d in formData.transfers track by $index" id="$index" ng-click="editTransferData(d, $index)">
+                                            <tr ng-repeat="d in formData.transfers track by $index" id="$index" ng-click="editTransferData(d, $index)" ng-class="{'rowSelected' : transferRowSelected[$index]}">
                                                 <td>{{d.date | date:"MM/dd/yyyy"}}</td>
                                                 <td>{{d.kind}}</td>
                                                 <td>{{formatTransferOrigin(d)}}</td>
@@ -362,7 +361,8 @@
                                     </md-input-container>
                                 </div>
                                 <div layout="row">
-                                        <button style="height:24px;margin-top:25px;" type="button" ng-click="appendNewTransfer()" flex="20">Add Transfer</button>
+                                        <button style="height:24px;margin-top:25px;margin-left:12px;" type="button" ng-click="appendNewTransfer()" flex="12">Save Transfer</button>
+                                        <button style="height:24px;margin-top:25px;margin-left:12px;" type="button" ng-click="deleteTransfer()" flex="12">Delete Transfer</button>
                                 </div>  
                             </md-content>
                         </md-tab>

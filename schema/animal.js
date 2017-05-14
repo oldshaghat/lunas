@@ -10,7 +10,8 @@ var AnimalSchema = new mongoose.Schema({
     //description
     name : String,
     kind : String,  
-    breed : String,     //derived enum from kind value - see animalManagement.js 
+    breed : String,     //derived enum from kind value - see animalManagement.js  ... PRIMARY breed
+    secondaryBreed : String, // optional if cross bred
     coloration : String,  //standard list? 
     size : String, // Small | Medium | Large | Very Large
     coat : String, // Short | Medium | Long | Rough | Curly | Hairless 
@@ -74,7 +75,7 @@ var AnimalSchema = new mongoose.Schema({
     //   animals going out (so to some person hopefully in the volunteer database but we can't know that for sure )
     transfers : [ {
         date : Date,
-        kind : String, // (incoming) Surrender, Transfer In, Stray, Animal Control, Return, (outgoing) Adoption, Deceased, Transfer Out
+        kind : String, // (incoming) Surrender, Transfer In, Stray, Animal Control, Return, (outgoing) Foster, Adoption, Deceased, Transfer Out
         origin : String, //string data
         originType : String, // Lunas | Individual Name | Shelter Name | N/A //enum data 
         dest : String,

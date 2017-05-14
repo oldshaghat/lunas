@@ -208,10 +208,10 @@ function buildCriteria(req) {
     var criteria = {}; //we're going to AND together a set of clauses 
     var critList = []; 
     
-    if (req.query.email) {
+    if (typeof req.query.email != "undefined") {
         critList.push({'email' : new RegExp(req.query.email, 'i')});
     }
-    if (req.query.name) {
+    if (typeof req.query.name != "undefined") {
         //if name term contains a space they might be typing a first name part and a last name part or vice versa (search for smith bob vs bob smith)
         if (req.query.name.indexOf(' ') > 0) {
             //what if we're looking for some name via three pieces? haha
@@ -225,16 +225,16 @@ function buildCriteria(req) {
             critList.push({'$or' : [ {'firstName' : reg}, {'lastName' : reg}]});
         }
     }
-    if (req.query.training) {
+    if (typeof req.query.training != "undefined") {
         var training = req.query.training;
         //we expect this to be a # 0 .. 8
         var fields = ['trainedCats', 'trainedCatsPetsmart', 'trainedDogs', 'trainedRabbit', 'trainedSmalls', 'trainedCatsQuarantine', 'trainedDogsQuarantine', 'trainedRabbitQuarantine', 'trainedSmallsQuarantine'];
         var fname = 'volunteerData.status.' + fields[training];
         var c = {};
-        c[fname] = {'$exists' : false};
+        c[fname] = {'$nin' : [null]};
         critList.push(c);
     }
-    if (req.query.interests) {
+    if (typeof req.query.interests != "undefined") {
         var interests = req.query.interests;
         //we expect this to be a # 0 .. 6
         var fields = ['cats', 'dogs', 'rabbits', 'smalls', 'maintenance', 'fundraising', 'events']; //TODO add new interests to filter support
@@ -243,7 +243,7 @@ function buildCriteria(req) {
         c[fname] = {'$gt' : 0};
         critList.push(c);
     }
-    if (req.query.availability) {
+    if (typeof req.query.availability != "undefined") {
         var av = req.query.availability;
         //we expect this to be in the form x_y : day and time period  ...
         var dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -256,10 +256,10 @@ function buildCriteria(req) {
         o[faccess] = true;
         critList.push(o);
     }
-    if (req.query.activeOnly) {
+    if (typeof req.query.activeOnly != "undefined") {
         critList.push({'volunteerData.activeVolunteer' : true});
     }
-    if (req.query.age) {
+    if (typeof req.query.age != "undefined") {
         //back calculate the birthday
         var age = req.query.age; 
         var bday = new Date(); 
@@ -525,6 +525,29 @@ app.delete('/api/volunteers/' ,
 
 function buildAnimalCriteria(req) {
     var criteria = {}; //we're going to AND together a set of clauses 
+    var critList = []; 
+    
+    if (typeof req.query.name != "undefined") {
+        critList.push({'name' : new RegExp(req.query.name, 'i')});
+    }        
+    if (typeof req.query.breed != "undefined") {
+        critList.push({'breed' : new RegExp(req.query.breed, 'i')});
+    }       
+    if (typeof req.query.status != "undefined") {
+        //we expect this to be a # 0 .. 4
+        var fields = ['Quarantined', 'Adoptable', 'Pending Adoption', 'Adopted', 'Deceased'];
+        var val = fields[req.query.status];
+        critList.push({'status' : new RegExp(val, 'i')});
+    }
+    if (typeof req.query.group != "undefined") {
+        //we expect this to be a # 0 .. 6
+        var fields = ['Cat', 'Dog', 'Rabbit', 'Small', 'Bird', 'Reptile', 'Other'];
+        var val = fields[req.query.group];
+        critList.push({'kind' : new RegExp(val, 'i')});
+    }
+    if (critList.length > 0) {
+        criteria['$and'] = critList;
+    }
     return criteria;
 };
 
