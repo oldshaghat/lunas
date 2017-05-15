@@ -142,9 +142,7 @@ animalManagement.controller('AnimalManagementController', function AnimalManagem
         }
         else if ($scope.filterModel.criteriaType == 2) {
             var term = $scope.filterModel.criteriaSpecies;
-            var code = term.split(":")[0];
-            var desc = term.split(":")[1];
-            var f = {summary : 'Kind of animal is ' + desc, kind : 'group', term : code};
+            var f = {summary : 'Kind of animal is ' + desc, kind : 'kind', term : term};
             addOrUpdateFilter(f);
         }
         else if ($scope.filterModel.criteriaType == 3) {

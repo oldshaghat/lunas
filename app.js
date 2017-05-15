@@ -532,18 +532,16 @@ function buildAnimalCriteria(req) {
     }        
     if (typeof req.query.breed != "undefined") {
         critList.push({'breed' : new RegExp(req.query.breed, 'i')});
-    }       
+    }
     if (typeof req.query.status != "undefined") {
         //we expect this to be a # 0 .. 4
         var fields = ['Quarantined', 'Adoptable', 'Pending Adoption', 'Adopted', 'Deceased'];
         var val = fields[req.query.status];
         critList.push({'status' : new RegExp(val, 'i')});
     }
-    if (typeof req.query.group != "undefined") {
-        //we expect this to be a # 0 .. 6
-        var fields = ['Cat', 'Dog', 'Rabbit', 'Small', 'Bird', 'Reptile', 'Other'];
-        var val = fields[req.query.group];
-        critList.push({'kind' : new RegExp(val, 'i')});
+    if (typeof req.query.kind != "undefined") {
+        //we expect this to be the text
+        critList.push({'kind' : new RegExp(req.query.kind, 'i')});
     }
     if (critList.length > 0) {
         criteria['$and'] = critList;
