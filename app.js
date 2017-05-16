@@ -593,18 +593,55 @@ app.post('/api/animals/',
             //if the body doesn't supply an ID we are inserting a new one
             var oid = req.body._id;
             if (!oid) {
-                req.body._id = new mongoose.mongo.ObjectID();
+                oid = new mongoose.mongo.ObjectID();
             }
             //VALIDATION / defaulting
             req.body.approxWeight = validateNumber(req.body.approxWeight, 0);
             Animal.findOneAndUpdate(
-                { _id : req.body._id },
-                req.body,       //maybe we can just ... pass the body directly? assuming we've validated everything anyway
+                { _id : oid },
+                {
+                    _id : oid,
+                    name : req.body.name,
+                    kind : req.body.kind,  
+                    breed : req.body.breed,    
+                    secondaryBreed : req.body.secondaryBreed,
+                    coloration : req.body.coloration,  
+                    size : req.body.size, 
+                    coat : req.body.coat, 
+                    approxWeight : req.body.approxWeight, 
+                    birthday : req.body.birthday,
+                    birthdayApproximated : req.body.birthdayApproximated, 
+                    descriptionNotes : req.body.descriptionNotes, 
+                    sex : req.body.sex,
+                    altered : req.body.altered, 
+                    alteredDate : req.body.alteredDate,
+                    healthNotes : req.body.healthNotes, 
+                    microchipped : req.body.microchipped,
+                    chippedDate : req.body.chippedDate,
+                    chipId : req.body.chipId,
+                    chipModel : req.body.chipModel, 
+                    housetrained : req.body.housetrained,
+                    status : req.body.status,
+                    fostered : req.body.fostered,
+                    isDeclawed : req.body.isDeclawed,
+                    fivlTested : req.body.fivlTested,
+                    fivPositive : req.body.fivPositive,
+                    flvPositive : req.body.flvPositive,
+                    heartwormTested : req.body.heartwormTested,
+                    heartwormPositive : req.body.heartwormPositive,
+                    rabiesTag : req.body.rabiesTag,
+                    pictures : req.body.pictures,
+                    getsAlongWithCats : req.body.getsAlongWithCats,
+                    getsAlongWithDogs : req.body.getsAlongWithDogs,
+                    getsAlongWithKids : req.body.getsAlongWithKids,
+                    litterNotes : req.body.litterNotes,
+                    bondedWith : req.body.bondedWith, 
+                    transfers : req.body.transfers
+                },
                 { upsert : true },
                 function(err, ani) {
                     if (err) {
                         res.send(err); 
-//                        res.redirect('/adb'); 
                     } else {
                         animalTableQuery(req, res);
                     }
