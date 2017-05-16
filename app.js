@@ -593,19 +593,18 @@ app.post('/api/animals/',
             //if the body doesn't supply an ID we are inserting a new one
             var oid = req.body._id;
             if (!oid) {
-                oid = new mongoose.mongo.ObjectID();
+                req.body._id = new mongoose.mongo.ObjectID();
             }
             //VALIDATION / defaulting
             req.body.approxWeight = validateNumber(req.body.approxWeight, 0);
             Animal.findOneAndUpdate(
-                { _id : oid },
+                { _id : req.body._id },
                 req.body,       //maybe we can just ... pass the body directly? assuming we've validated everything anyway
                 { upsert : true },
                 function(err, ani) {
                     if (err) {
                         res.send(err); 
-                        console.log(err);
-                        res.redirect('/adb'); 
+//                        res.redirect('/adb'); 
                     } else {
                         animalTableQuery(req, res);
                     }
