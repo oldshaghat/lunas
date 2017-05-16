@@ -600,7 +600,6 @@ app.post('/api/animals/',
             Animal.findOneAndUpdate(
                 { _id : oid },
                 {
-                    _id : oid,
                     name : req.body.name,
                     kind : req.body.kind,  
                     breed : req.body.breed,    
