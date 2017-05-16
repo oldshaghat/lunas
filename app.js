@@ -603,6 +603,7 @@ app.post('/api/animals/',
                 { upsert : true },
                 function(err, ani) {
                     if (err) {
+                        res.send(err); 
                         console.log(err);
                         res.redirect('/adb'); 
                     } else {
@@ -620,7 +621,7 @@ app.delete('/api/animals/',
                     res.json(animals);
                 });
             }
-            //Also / first remove this volunteer from any schedules
+           
            Animal.remove(
                 { _id : req.query.id },
                 function (err, r) {
