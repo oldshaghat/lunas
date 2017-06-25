@@ -8,7 +8,8 @@ reporting.controller('ReportController', function ReportController($scope, $http
         respectOptOut : true,
         deDuplicate : true,
         skipInactive : true,
-        skipDisqualified : true
+        skipDisqualified : true,
+        filterTraining: false
     };
     
     $scope.emailReport = [];

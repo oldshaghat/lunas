@@ -811,7 +811,8 @@ app.get('/api/report/email',
             var respectOptOut = req.query.respectOptOut;
             var skipInactive = req.query.skipInactive;
             var skipDisqualified = req.query.skipDisqualified;
-    
+            var filterTraining = req.query.filterTraining;
+            var criteriaTraining = req.query.criteriaTraining;
             var minorsBornAfter = new Date();
             minorsBornAfter.setFullYear(minorsBornAfter.getFullYear() - 18);
     
@@ -836,6 +837,11 @@ app.get('/api/report/email',
                 criteria['disqualifyingData.failedVetCheck'] =  null;
                 criteria['disqualifyingData.failedHomeInspection'] =  null;
                 criteria['disqualifyingData.notes'] =  null;
+            }
+            if (filterTraining != 'false' && criteriaTraining) {
+                  var fields = ['trainedCats', 'trainedCatsPetsmart', 'trainedDogs', 'trainedRabbit', 'trainedSmalls'];
+                  var fname = 'volunteerData.status.' + fields[criteriaTraining-1];
+                  criteria[fname] = {'$nin' : [null]};
             }
             Volunteer.find(criteria, projection, function (err, results) {
                     if (err) {

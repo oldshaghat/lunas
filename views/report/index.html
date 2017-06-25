@@ -49,6 +49,19 @@
                         Exclude Disqualified Volunteers?
                     </md-checkbox>
                 </md-input-container>
+                <md-input-container class="md-block" flex-gt-sm>
+                    <md-tooltip>Filter on training type?</md-tooltip>
+                    <md-checkbox ng-model="emailOptions.filterTraining">
+                        Filter on training?
+                    </md-checkbox>
+                    <select class="input-lg" ng-model="emailOptions.criteriaTraining" ng-show="emailOptions.filterTraining">
+                        <option value="1">Cats</option>
+                        <option value="2">Petsmart Cats</option>
+                        <option value="3">Dogs</option>
+                        <option value="4">Rabbits</option>
+                        <option value="5">Smalls</option>
+                    </select>
+                </md-input-container>
                 <button type="submit" ng-click="runEmailReport()">Run</button>
             </form>
             
