@@ -28,7 +28,7 @@ var dbUrl = 'mongodb://localhost:27017/volunteers';
 if (process.env.MONGODB_PASSWORD) {
     dbUrl = process.env.MONGODB_USER + ":" +
     process.env.MONGODB_PASSWORD + "@" +
-    "127.0.01:27017/"  +
+    "127.0.0.1:27017/"  +
     process.env.MONGODB_DATABASE;
 }
 
