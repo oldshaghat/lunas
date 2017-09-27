@@ -25,12 +25,11 @@ const http         = require('http'),
 
 var dbUrl = 'mongodb://localhost:27017/volunteers';
 //look for process variables (ie, we're deployed on open shift) to rewrite the url 
-if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
-    dbUrl = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +
-    process.env.OPENSHIFT_MONGODB_DB_PASSWORD + "@" +
-    process.env.OPENSHIFT_MONGODB_DB_HOST + ':' +
-    process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
-    process.env.OPENSHIFT_APP_NAME;
+if (process.env.MONGODB_PASSWORD) {
+    dbUrl = process.env.MONGODB_USER + ":" +
+    process.env.MONGODB_PASSWORD + "@" +
+    "127.0.01:27017/"  +
+    process.env.MONGODB_DATABASE;
 }
 
 var defaultUser = 'admin';
