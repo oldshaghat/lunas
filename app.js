@@ -33,6 +33,19 @@ if (process.env.OPENSHIFT_MONGODB_DB_PASSWORD) {
     process.env.OPENSHIFT_APP_NAME;
 }
 
+var defaultUser = 'admin';
+if (process.env.LUNAS_DEFAULT_USER) {
+    defaultUser = process.env.LUNAS_DEFAULT_USER;
+}
+var defaultPass = 'admin';
+if (process.env.LUNAS_DEFAULT_PASS) {
+    defaultPass = process.env.LUNAS_DEFAULT_PASS;
+}
+var defaultEmail = '';
+if (process.env.LUNAS_DEFAULT_EMAIL) {
+    defaultEmail = process.env.LUNAS_DEFAULT_EMAIL;
+}
+
 //Data Access Obj.
 var User;
 var Volunteer;
@@ -55,7 +68,7 @@ db.once('open', function() {
     //do we have at least one user? 
     User.count({}, function(err, count) {
        if (count == 0) {
-           createUser('admin', 'snarglepuss', 'oldshaghat@gmail.com', 0);
+           createUser(defaultUser, defaultPass, defaultEmail, 0);
        } 
     });
     
@@ -67,6 +80,11 @@ db.once('open', function() {
 
 var app = express();
 
+var sessionSecret = "localhost";
+if (process.env.LUNAS_SESSION_SECRET) {
+    sessionSecret = process.env.LUNAS_SESSION_SECRET;
+}
+
 app.use(express.static('static'));
 app.use('/bower', express.static(path.join(__dirname, 'bower_components')));
 app.use(express.static('views'));
@@ -74,7 +92,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded( { extended : true }));
 app.use(bodyParser.json());
 app.use(session( {
-    secret : 'blinky foobar dongerdash',
+    secret : sessionSecret,
     saveUninitialized : true,
     resave : true
 })); //must precede passport session
