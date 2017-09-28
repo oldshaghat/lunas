@@ -29,7 +29,7 @@ if (process.env.MONGODB_PASSWORD) {
     dbUrl = process.env.MONGODB_USER + ":" +
     process.env.MONGODB_PASSWORD + "@" +
     process.env.MONGODB_IP + ":" + 
-    process.env.MONGODB_PORT + ""/"  +
+    process.env.MONGODB_PORT + "/"  +
     process.env.MONGODB_DATABASE;
 }
 
