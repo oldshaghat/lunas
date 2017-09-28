@@ -20,7 +20,6 @@
     "passport-local":   "latest",
     "bower":            "latest",
     "mongodb" :         "latest",
-    "mongoose" :        "latest",
-    "crypto"    :       "latest"
+    "mongoose" :        "latest"
   }
 }
