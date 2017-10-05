@@ -21,6 +21,7 @@
     "bower":            "latest",
     "mongodb" :         "latest",
     "mongoose" :        "latest",
-    "crypto"    :       "latest"
+    "crypto"    :       "latest",
+    "connect-mongodb-session" : "latest"
   }
 }

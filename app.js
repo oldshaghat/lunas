@@ -11,6 +11,7 @@ const http         = require('http'),
       LocalStrategy= require('passport-local').Strategy,
       express      = require('express'),
       session      = require('express-session'),
+      mongoStore   = require('connect-mongodb-session')(session),
       bodyParser   = require('body-parser'),
       cookieParser = require('cookie-parser'),
       crypto       = require('crypto'),
@@ -26,7 +27,7 @@ const http         = require('http'),
 var dbUrl = 'mongodb://localhost:27017/volunteers';
 //look for process variables (ie, we're deployed on open shift) to rewrite the url 
 if (process.env.MONGODB_PASSWORD) {
-    dbUrl = process.env.MONGODB_USER + ":" +
+    dbUrl = 'mongodb://' + process.env.MONGODB_USER + ":" +
     process.env.MONGODB_PASSWORD + "@" +
     process.env.MONGODB_IP + ":" + 
     process.env.MONGODB_PORT + "/"  +
@@ -57,7 +58,10 @@ var Animal;
 //var emailTransport = emailer.createTransport('smtps:tbd%40gmail.com:pass@smtp.gmail.com');
 var emailTransport = {}; //emailer.createTransport('smtps:tbd%40gmail.com:pass@smtp.gmail.com');
 
-mongoose.connect(dbUrl);
+//use global (ES6) promises
+mongoose.Promise = global.Promise;
+
+mongoose.connect(dbUrl, { useMongoClient : true });
 var db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'connection error to db'));
@@ -80,6 +84,17 @@ db.once('open', function() {
 
 var app = express();
 
+var store = new mongoStore(
+    {
+        uri : dbUrl,
+        collection: 'sessionStore'
+    }
+);
+store.on('error', function(error) {
+    assert.ifError(error);
+    assert.ok(false);
+});
+
 var sessionSecret = "localhost";
 if (process.env.LUNAS_SESSION_SECRET) {
     sessionSecret = process.env.LUNAS_SESSION_SECRET;
@@ -93,6 +108,10 @@ app.use(bodyParser.urlencoded( { extended : true }));
 app.use(bodyParser.json());
 app.use(session( {
     secret : sessionSecret,
+    cookie : {
+        maxAge : 2*1000*60*60*24*7 //2 weeks
+    },
+    store : store,
     saveUninitialized : true,
     resave : true
 })); //must precede passport session
@@ -1011,7 +1030,7 @@ app.get('*', function(req, res) {
 var server = http.createServer(app);
 
 server.listen(env.NODE_PORT || 3000, env.NODE_IP || 'localhost', function () {
-  console.log(`Application worker ${process.pid} started...`);
+  console.log(`Application worker ${process.pid} started... listening on port ` + (env.NODE_PORT || 3000));
 });
 
 /*
