@@ -898,6 +898,68 @@ app.get('/api/report/email',
                 });
 });
 
+app.get('/api/report/address', 
+       verifyAuth,
+       function(req, res) {
+            var respectOptOut = req.query.respectOptOut;
+            var skipInactive = req.query.skipInactive;
+            var skipDisqualified = req.query.skipDisqualified;
+            var minorsBornAfter = new Date();
+            minorsBornAfter.setFullYear(minorsBornAfter.getFullYear() - 18);
+ 
+            var projection = {'firstName' : 1, 'lastName' : 1, 'address' : 1, 'city' : 1, 'state' : 1, 'zip' : 1};
+
+            var criteria = {
+                'firstName' : {'$ne' : null},
+                'lastName' : {'$ne' : null},
+                'address' : {'$ne' : null},
+                'city' : {'$ne' : null},
+                'state' : {'$ne' : null},
+                'zip' : {'$ne' : null},
+                'volunteerData.birthday' : {'$lte' : minorsBornAfter}
+            };
+    
+            if (respectOptOut != 'false') {
+                criteria['doNotEmail'] = {'$in' : [null, false]};
+            }
+            if (skipInactive != 'false') {
+                criteria['volunteerData.activeVolunteer'] = true;
+            }
+            if (skipDisqualified != 'false') {
+                criteria['disqualifyingData.surrenderedAnimal'] =  null;
+                criteria['disqualifyingData.failedVetCheck'] =  null;
+                criteria['disqualifyingData.failedHomeInspection'] =  null;
+                criteria['disqualifyingData.notes'] =  null;
+            }
+
+            Volunteer.find(criteria, projection, function (err, results) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    //manual distinct since mongoose doesn't like to do projection + distincting
+                    //we can't do Set since we want a more complex duplicating check
+                    var uniqueResults = [];
+                    
+                    for (var i = 0; i < results.length; i++) {
+                        var r = results[i];
+                        var contained = false;
+                        for (var j = 0; j < uniqueResults.length; j++) {
+                            var u = uniqueResults[j];
+                            if (u.address.trim() === r.address.trim()) {
+                                if (u.zip.trim() === r.zip.trim()) {
+                                    contained = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!contained) {
+                            uniqueResults.push(r);
+                        }
+                    }
+                    
+                    res.json(uniqueResults);
+                });
+});
 
 app.get('/api/report/emergencyContact',
        verifyAuth,

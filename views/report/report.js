@@ -14,6 +14,14 @@ reporting.controller('ReportController', function ReportController($scope, $http
     
     $scope.emailReport = [];
     
+    $scope.addressOptions = {
+        respectOptOut : true,
+        skipInactive : true,
+        skipDisqualified : true
+        
+    };
+    
+    $scope.addressReport = [];
     
     $scope.emergOptions = {
         skipInactive : true
@@ -38,5 +46,13 @@ reporting.controller('ReportController', function ReportController($scope, $http
         });
     };
     
+    $scope.runAddressReport = function() {
+        $http.get('/api/report/address', {params : $scope.addressOptions})
+            .then(function(r) { 
+                $scope.addressReport = r.data;
+        }, function (e) {
+            console.log(e);
+        });
+    };
 });
   

@@ -104,7 +104,33 @@
         <md-tab label="Upcoming Birthdays">
             Find out who (volunteers) (or animals?) have a birthday coming up soon
         </md-tab>
-        
+        <md-tab label="Mailing Address Report">
+            <form>
+                <md-input-container class="md-block" flex-gt-sm>
+                    <md-tooltip>If a volunteer requests "no bulk email" they will not be included </md-tooltip>
+                    <md-checkbox ng-model="addressOptions.respectOptOut" aria-label="Use Opt Out?">
+                        Respect (email) Opt Out Flag?
+                    </md-checkbox>
+                </md-input-container>
+                <md-input-container class="md-block" flex-gt-sm>
+                    <md-tooltip>Should addresses belonging to inactive volunteers be included?</md-tooltip>
+                    <md-checkbox ng-model="addressOptions.skipInactive" aria-label="Active Only?">
+                        Exclude Inactive Volunteers?
+                    </md-checkbox>
+                </md-input-container>
+                <md-input-container class="md-block" flex-gt-sm>
+                    <md-tooltip>Should addresses belonging to disqualified volunteers be included?</md-tooltip>
+                    <md-checkbox ng-model="addressOptions.skipDisqualified" aria-label="Exclude Disqualified?">
+                        Exclude Disqualified Volunteers?
+                    </md-checkbox>
+                </md-input-container>
+                <button type="submit" ng-click="runAddressReport()">Run</button>
+            </form>
+            
+            <div class="results">
+                <div ng-repeat="e in addressReport track by $index">{{e.firstName}},{{e.lastName}},{{e.address}},{{e.city}},{{e.state}},{{e.zip}}</div>
+            </div>
+        </md-tab>
     </md-tabs>
 
     
