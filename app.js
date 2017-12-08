@@ -580,6 +580,10 @@ function buildAnimalCriteria(req) {
         //we expect this to be the text
         critList.push({'kind' : new RegExp(req.query.kind, 'i')});
     }
+    if (typeof req.query.chip != "undefined") {
+        //we expect this to be the text
+        critList.push({'chipId' : new RegExp(req.query.chip, 'i')});
+    }
     if (critList.length > 0) {
         criteria['$and'] = critList;
     }

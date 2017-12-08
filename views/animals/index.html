@@ -23,9 +23,10 @@
             <option value="1">Name</option>
             <option value="2">Kind</option>
             <option value="3">Breed</option>
+            <option value="4">Chip #</option>
         </select>
 
-        <input type="text" class="input-lg" ng-model="filterModel.criteriaText" ng-show="filterModel.criteriaType=='1' || filterModel.criteriaType=='3'">
+        <input type="text" class="input-lg" ng-model="filterModel.criteriaText" ng-show="filterModel.criteriaType=='1' || filterModel.criteriaType=='3' || filterModel.criteriaType=='4'">
         <select class="input-lg" ng-model="filterModel.criteriaStatus" ng-show="filterModel.criteriaType=='0'">
             <option value="0:Quarantined">Quarantined</option>
             <option value="1:Adoptable">Adoptable</option>
