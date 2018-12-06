@@ -273,8 +273,8 @@ function buildCriteria(req) {
     }
     if (typeof req.query.interests != "undefined") {
         var interests = req.query.interests;
-        //we expect this to be a # 0 .. 6
-        var fields = ['cats', 'dogs', 'rabbits', 'smalls', 'maintenance', 'fundraising', 'events']; //TODO add new interests to filter support
+        //we expect this to be a # 0 .. 10
+        var fields = ['cats', 'dogs', 'rabbits', 'smalls', 'maintenance', 'fundraising', 'events', 'fosterCare', 'adopterEducation', 'donationTransport', 'humaneEducation']; 
         var fname = 'volunteerData.interests.' + fields[interests];
         var c = {}; 
         c[fname] = {'$gt' : 0};
@@ -583,6 +583,10 @@ function buildAnimalCriteria(req) {
     if (typeof req.query.chip != "undefined") {
         //we expect this to be the text
         critList.push({'chipId' : new RegExp(req.query.chip, 'i')});
+    }
+    if (typeof req.query.person != "undefined") {
+        var n = new RegExp(req.query.person, 'i');
+        critList.push({'$or' : [{'transfers.origin': n}, {'transfers.dest': n}] });
     }
     if (critList.length > 0) {
         criteria['$and'] = critList;

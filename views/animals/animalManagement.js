@@ -157,6 +157,12 @@ animalManagement.controller('AnimalManagementController', function AnimalManagem
             var f = {summary : 'Chip Id contains ' + term, kind : 'chip', term : term};
             addOrUpdateFilter(f);
         }
+        else if ($scope.filterModel.criteriaType == 5) {
+            var term = $scope.filterModel.criteriaText;
+            term = escapeRegExp(term);
+            var f = {summary : 'Transfer person contains ' + term, kind : 'person', term : term};
+            addOrUpdateFilter(f);
+        }
         queryTableData();
         
         $scope.filterModel = {};

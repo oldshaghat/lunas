@@ -17,63 +17,77 @@
     <div ng-include="'../nav/nav.html'"></div>
     
     <div class="filter">
-        <select class="input-lg" ng-model="filterModel.criteriaType">
-            <option value="0" selected>Email Address</option>
-            <option value="1">Name</option>
-            <option value="2">Training</option>
-            <option value="3">Interests</option>
-            <option value="4">Availability</option>
-            <option value="5">Active Only</option>
-            <option value="6">Older than 14</option>
-            <option value="7">Older than 18</option>
-        </select>
-
-        <input type="text" class="input-lg" ng-model="filterModel.criteriaText" ng-show="filterModel.criteriaType=='0' || filterModel.criteriaType=='1'">
-        <select class="input-lg" ng-model="filterModel.criteriaTraining" ng-show="filterModel.criteriaType=='2'">
-            <option value="0:Cats">Cats</option>
-            <option value="1:Petsmart Cats">Petsmart Cats</option>
-            <option value="2:Dogs">Dogs</option>
-            <option value="3:Rabbits">Rabbits</option>
-            <option value="4:Smalls">Smalls</option>
-            <option value="5:Q Cats">Q Cats</option>
-            <option value="6:Q Dogs">Q Dogs</option>
-            <option value="7:Q Rabbits">Q Rabbits</option>
-            <option value="8:Q Smalls">Q Smalls</option>
-        </select>
-        <select class="input-lg" ng-model="filterModel.criteriaInterests" ng-show="filterModel.criteriaType=='3'">
-            <option value="0:Cats">Cats</option>
-            <option value="1:Dogs">Dogs</option>
-            <option value="2:Rabbits">Rabbits</option>
-            <option value="3:Smalls">Smalls</option>
-            <option value="4:Maintenance">Maintenance</option>
-            <option value="5:Fundraising">Fundraising</option>
-            <option value="6:Events">Events</option>
-        </select>
-        <select class="input-lg" ng-model="filterModel.criteriaAvailability" ng-show="filterModel.criteriaType=='4'">
-            <option value="0_0:Monday Morning">Monday Morning</option>
-            <option value="0_1:Monday Afternoon">Monday Afternoon</option>
-            <option value="0_2:Monday Evening">Monday Evening</option>  
-            <option value="1_0:Tuesday Morning">Tuesday Morning</option>
-            <option value="1_1:Tuesday Afternoon">Tuesday Afternoon</option>
-            <option value="1_2:Tuesday Evening">Tuesday Evening</option>
-            <option value="2_0:Wednesday Morning">Wednesday Morning</option>
-            <option value="2_1:Wednesday Afternoon">Wednesday Afternoon</option>
-            <option value="2_2:Wednesday Evening">Wednesday Evening</option>
-            <option value="3_0:Thursday Morning">Thursday Morning</option>
-            <option value="3_1:Thursday Afternoon">Thursday Afternoon</option>
-            <option value="3_2:Thursday Evening">Thursday Evening</option>  
-            <option value="4_0:Friday Morning">Friday Morning</option>
-            <option value="4_1:Friday Afternoon">Friday Afternoon</option>
-            <option value="4_2:Friday Evening">Friday Evening</option>
-            <option value="5_0:Saturday Morning">Saturday Morning</option>
-            <option value="5_1:Saturday Afternoon">Saturday Afternoon</option>
-            <option value="5_2:Saturday Evening">Saturday Evening</option>
-            <option value="6_0:Sunday Morning">Sunday Morning</option>
-            <option value="6_1:Sunday Afternoon">Sunday Afternoon</option>
-            <option value="6_2:Sunday Evening">Sunday Evening</option>
-        </select>
-        <button class="btn btn-primary btn-lg" ng-click="addCriteria()">Add Filter</button>
-        
+         <md-input-container class="md-block input-lg" flex-gt-sm>
+            <md-select class="form-control input-lg text-center" ng-model="filterModel.criteriaType">
+            <md-option value="0" selected>Email Address</md-option>
+            <md-option value="1">Name</md-option>
+            <md-option value="2">Training</md-option>
+            <md-option value="3">Interests</md-option>
+            <md-option value="4">Availability</md-option>
+            <md-option value="5">Active Only</md-option>
+            <md-option value="6">Older than 14</md-option>
+            <md-option value="7">Older than 18</md-option>
+            </md-select> 
+        </md-input-container>
+        <md-input-container class="md-block" flex-gt-sm>
+            <input type="text" class="input-lg" ng-model="filterModel.criteriaText" ng-show="filterModel.criteriaType=='0' || filterModel.criteriaType=='1'">
+        </md-input-container>
+        <md-input-container class="md-block input-lg" flex-gt-sm>
+            <md-select class="input-lg" ng-model="filterModel.criteriaTraining" ng-show="filterModel.criteriaType=='2'">
+                <md-option value="0:Cats">Cats</md-option>
+                <md-option value="1:Petsmart Cats">Petsmart Cats</md-option>
+                <md-option value="2:Dogs">Dogs</md-option>
+                <md-option value="3:Rabbits">Rabbits</md-option>
+                <md-option value="4:Smalls">Smalls</md-option>
+                <md-option value="5:Q Cats">Q Cats</md-option>
+                <md-option value="6:Q Dogs">Q Dogs</md-option>
+                <md-option value="7:Q Rabbits">Q Rabbits</md-option>
+                <md-option value="8:Q Smalls">Q Smalls</md-option>
+            </md-select>
+        </md-input-container>
+        <md-input-container class="md-block input-lg" flex-gt-sm>
+        <md-select class="input-lg" ng-model="filterModel.criteriaInterests" ng-show="filterModel.criteriaType=='3'">
+            <md-option value="0:Cats">Cats</md-option>
+            <md-option value="1:Dogs">Dogs</md-option>
+            <md-option value="2:Rabbits">Rabbits</md-option>
+            <md-option value="3:Smalls">Smalls</md-option>
+            <md-option value="4:Maintenance">Maintenance</md-option>
+            <md-option value="5:Fundraising">Fundraising</md-option>
+            <md-option value="6:Events">Events</md-option>
+            <md-option value="7:Foster Care">Foster Care</md-option>
+            <md-option value="8:Adopter Education">Adopter Education</md-option>
+            <md-option value="9:Donation Transport">Donation Transport</md-option>
+            <md-option value="10:Humane Education">Humane Education</md-option>
+        </md-select>
+        </md-input-container>
+        <md-input-container class="md-block input-lg" flex-gt-sm>
+        <md-select class="input-lg" ng-model="filterModel.criteriaAvailability" ng-show="filterModel.criteriaType=='4'">
+            <md-option value="0_0:Monday Morning">Monday Morning</md-option>
+            <md-option value="0_1:Monday Afternoon">Monday Afternoon</md-option>
+            <md-option value="0_2:Monday Evening">Monday Evening</md-option>  
+            <md-option value="1_0:Tuesday Morning">Tuesday Morning</md-option>
+            <md-option value="1_1:Tuesday Afternoon">Tuesday Afternoon</md-option>
+            <md-option value="1_2:Tuesday Evening">Tuesday Evening</md-option>
+            <md-option value="2_0:Wednesday Morning">Wednesday Morning</md-option>
+            <md-option value="2_1:Wednesday Afternoon">Wednesday Afternoon</md-option>
+            <md-option value="2_2:Wednesday Evening">Wednesday Evening</md-option>
+            <md-option value="3_0:Thursday Morning">Thursday Morning</md-option>
+            <md-option value="3_1:Thursday Afternoon">Thursday Afternoon</md-option>
+            <md-option value="3_2:Thursday Evening">Thursday Evening</md-option>  
+            <md-option value="4_0:Friday Morning">Friday Morning</md-option>
+            <md-option value="4_1:Friday Afternoon">Friday Afternoon</md-option>
+            <md-option value="4_2:Friday Evening">Friday Evening</md-option>
+            <md-option value="5_0:Saturday Morning">Saturday Morning</md-option>
+            <md-option value="5_1:Saturday Afternoon">Saturday Afternoon</md-option>
+            <md-option value="5_2:Saturday Evening">Saturday Evening</md-option>
+            <md-option value="6_0:Sunday Morning">Sunday Morning</md-option>
+            <md-option value="6_1:Sunday Afternoon">Sunday Afternoon</md-option>
+            <md-option value="6_2:Sunday Evening">Sunday Evening</md-option>
+        </md-select>
+        </md-input-container>
+        <md-input-container class="md-block input-lg" flex-gt-sm>
+            <button class="btn btn-primary btn-lg" ng-click="addCriteria()">Add Filter</button>
+        </md-input-container>
         <ul>
             <li ng-repeat="f in filters"><span ng-click="removeCriteria($index)">[X]</span>{{f.summary}}</li>
         </ul>
