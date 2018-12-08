@@ -16,8 +16,11 @@
     
     <div ng-include="'../nav/nav.html'"></div>
     
-    <div class="filter">
-         <md-input-container class="md-block input-lg" flex-gt-sm>
+    <div class="filter" layout-gt-sm="row">
+        <md-input-container class="md-block" flex-gt-sm="7" style="margin-top:5px">
+            <md-button class="md-raised" ng-click="addCriteria()">Add Filter</button>
+        </md-input-container>
+        <md-input-container class="md-block" flex-gt-sm="15">
             <md-select class="form-control input-lg text-center" ng-model="filterModel.criteriaType">
             <md-option value="0" selected>Email Address</md-option>
             <md-option value="1">Name</md-option>
@@ -29,11 +32,11 @@
             <md-option value="7">Older than 18</md-option>
             </md-select> 
         </md-input-container>
-        <md-input-container class="md-block" flex-gt-sm>
-            <input type="text" class="input-lg" ng-model="filterModel.criteriaText" ng-show="filterModel.criteriaType=='0' || filterModel.criteriaType=='1'">
+        <md-input-container class="md-block" flex-gt-sm="30" ng-show="filterModel.criteriaType=='0' || filterModel.criteriaType=='1'">
+            <input type="text" class="input-lg" ng-model="filterModel.criteriaText" >
         </md-input-container>
-        <md-input-container class="md-block input-lg" flex-gt-sm>
-            <md-select class="input-lg" ng-model="filterModel.criteriaTraining" ng-show="filterModel.criteriaType=='2'">
+        <md-input-container class="md-block input-lg" flex-gt-sm="30" ng-show="filterModel.criteriaType=='2'">
+            <md-select class="input-lg" ng-model="filterModel.criteriaTraining" >
                 <md-option value="0:Cats">Cats</md-option>
                 <md-option value="1:Petsmart Cats">Petsmart Cats</md-option>
                 <md-option value="2:Dogs">Dogs</md-option>
@@ -45,54 +48,53 @@
                 <md-option value="8:Q Smalls">Q Smalls</md-option>
             </md-select>
         </md-input-container>
-        <md-input-container class="md-block input-lg" flex-gt-sm>
-        <md-select class="input-lg" ng-model="filterModel.criteriaInterests" ng-show="filterModel.criteriaType=='3'">
-            <md-option value="0:Cats">Cats</md-option>
-            <md-option value="1:Dogs">Dogs</md-option>
-            <md-option value="2:Rabbits">Rabbits</md-option>
-            <md-option value="3:Smalls">Smalls</md-option>
-            <md-option value="4:Maintenance">Maintenance</md-option>
-            <md-option value="5:Fundraising">Fundraising</md-option>
-            <md-option value="6:Events">Events</md-option>
-            <md-option value="7:Foster Care">Foster Care</md-option>
-            <md-option value="8:Adopter Education">Adopter Education</md-option>
-            <md-option value="9:Donation Transport">Donation Transport</md-option>
-            <md-option value="10:Humane Education">Humane Education</md-option>
-        </md-select>
+        <md-input-container class="md-block input-lg" flex-gt-sm="30" ng-show="filterModel.criteriaType=='3'">
+            <md-select class="input-lg" ng-model="filterModel.criteriaInterests" >
+                <md-option value="0:Cats">Cats</md-option>
+                <md-option value="1:Dogs">Dogs</md-option>
+                <md-option value="2:Rabbits">Rabbits</md-option>
+                <md-option value="3:Smalls">Smalls</md-option>
+                <md-option value="4:Maintenance">Maintenance</md-option>
+                <md-option value="5:Fundraising">Fundraising</md-option>
+                <md-option value="6:Events">Events</md-option>
+                <md-option value="7:Foster Care">Foster Care</md-option>
+                <md-option value="8:Adopter Education">Adopter Education</md-option>
+                <md-option value="9:Donation Transport">Donation Transport</md-option>
+                <md-option value="10:Humane Education">Humane Education</md-option>
+            </md-select>
         </md-input-container>
-        <md-input-container class="md-block input-lg" flex-gt-sm>
-        <md-select class="input-lg" ng-model="filterModel.criteriaAvailability" ng-show="filterModel.criteriaType=='4'">
-            <md-option value="0_0:Monday Morning">Monday Morning</md-option>
-            <md-option value="0_1:Monday Afternoon">Monday Afternoon</md-option>
-            <md-option value="0_2:Monday Evening">Monday Evening</md-option>  
-            <md-option value="1_0:Tuesday Morning">Tuesday Morning</md-option>
-            <md-option value="1_1:Tuesday Afternoon">Tuesday Afternoon</md-option>
-            <md-option value="1_2:Tuesday Evening">Tuesday Evening</md-option>
-            <md-option value="2_0:Wednesday Morning">Wednesday Morning</md-option>
-            <md-option value="2_1:Wednesday Afternoon">Wednesday Afternoon</md-option>
-            <md-option value="2_2:Wednesday Evening">Wednesday Evening</md-option>
-            <md-option value="3_0:Thursday Morning">Thursday Morning</md-option>
-            <md-option value="3_1:Thursday Afternoon">Thursday Afternoon</md-option>
-            <md-option value="3_2:Thursday Evening">Thursday Evening</md-option>  
-            <md-option value="4_0:Friday Morning">Friday Morning</md-option>
-            <md-option value="4_1:Friday Afternoon">Friday Afternoon</md-option>
-            <md-option value="4_2:Friday Evening">Friday Evening</md-option>
-            <md-option value="5_0:Saturday Morning">Saturday Morning</md-option>
-            <md-option value="5_1:Saturday Afternoon">Saturday Afternoon</md-option>
-            <md-option value="5_2:Saturday Evening">Saturday Evening</md-option>
-            <md-option value="6_0:Sunday Morning">Sunday Morning</md-option>
-            <md-option value="6_1:Sunday Afternoon">Sunday Afternoon</md-option>
-            <md-option value="6_2:Sunday Evening">Sunday Evening</md-option>
-        </md-select>
+        <md-input-container class="md-block input-lg" flex-gt-sm="30" ng-show="filterModel.criteriaType=='4'">
+            <md-select class="input-lg" ng-model="filterModel.criteriaAvailability" >
+                <md-option value="0_0:Monday Morning">Monday Morning</md-option>
+                <md-option value="0_1:Monday Afternoon">Monday Afternoon</md-option>
+                <md-option value="0_2:Monday Evening">Monday Evening</md-option>  
+                <md-option value="1_0:Tuesday Morning">Tuesday Morning</md-option>
+                <md-option value="1_1:Tuesday Afternoon">Tuesday Afternoon</md-option>
+                <md-option value="1_2:Tuesday Evening">Tuesday Evening</md-option>
+                <md-option value="2_0:Wednesday Morning">Wednesday Morning</md-option>
+                <md-option value="2_1:Wednesday Afternoon">Wednesday Afternoon</md-option>
+                <md-option value="2_2:Wednesday Evening">Wednesday Evening</md-option>
+                <md-option value="3_0:Thursday Morning">Thursday Morning</md-option>
+                <md-option value="3_1:Thursday Afternoon">Thursday Afternoon</md-option>
+                <md-option value="3_2:Thursday Evening">Thursday Evening</md-option>  
+                <md-option value="4_0:Friday Morning">Friday Morning</md-option>
+                <md-option value="4_1:Friday Afternoon">Friday Afternoon</md-option>
+                <md-option value="4_2:Friday Evening">Friday Evening</md-option>
+                <md-option value="5_0:Saturday Morning">Saturday Morning</md-option>
+                <md-option value="5_1:Saturday Afternoon">Saturday Afternoon</md-option>
+                <md-option value="5_2:Saturday Evening">Saturday Evening</md-option>
+                <md-option value="6_0:Sunday Morning">Sunday Morning</md-option>
+                <md-option value="6_1:Sunday Afternoon">Sunday Afternoon</md-option>
+                <md-option value="6_2:Sunday Evening">Sunday Evening</md-option>
+            </md-select>
         </md-input-container>
-        <md-input-container class="md-block input-lg" flex-gt-sm>
-            <button class="btn btn-primary btn-lg" ng-click="addCriteria()">Add Filter</button>
-        </md-input-container>
+    </div>
+    <div layout-gt-sm="row">
         <ul>
             <li ng-repeat="f in filters"><span ng-click="removeCriteria($index)">[X]</span>{{f.summary}}</li>
         </ul>
-        
     </div>
+    
     <div class="paginationControls" layout="row">
         <div ng-click="previousPage()">&lt;</div> Page {{currPage}} of {{totalPages}}<div ng-click="nextPage()">&gt;</div>
     </div>

@@ -1,8 +1,15 @@
 
 .filter {
-    margin-top : 10px;
-    padding : 10px;
+    margin-top : 2px;
+    padding : 2px;
+    background-color:aliceblue;
     border : solid blue 1px;
+}
+.filter > md-input-container > md-select {
+    background-color:white;
+}
+.filter > md-input-container > input {
+    background-color:white;
 }
 
 .vlist > tbody > tr > td {
